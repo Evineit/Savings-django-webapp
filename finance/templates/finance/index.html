@@ -1,0 +1,23 @@
+{% extends "finance/layout.html" %}
+{% load static %}
+
+
+{% block body %}
+    <h1>All Posts</h1>
+    <div>
+        {% if user.is_authenticated %}
+        <div>
+            <h2>New Post</h2>
+            <form id="compose-form" class="post-new">
+                {% csrf_token %}
+                <textarea class="form-control" id="compose-body" placeholder="Body"></textarea>
+                <input type="submit" class="btn btn-primary"/>
+            </form>
+        </div>
+        {% endif %}
+    </div>
+{% endblock %}
+
+{% block script %}
+    <script src="{% static 'finance/index.js' %}"></script>
+{% endblock %}
