@@ -3,15 +3,32 @@
 
 
 {% block body %}
-    <h1>All Posts</h1>
+    <h1>{{finance}}</h1>
     <div>
         {% if user.is_authenticated %}
-        <div>
-            <h2>New Post</h2>
-            <form id="compose-form" class="post-new">
-                {% csrf_token %}
-                <textarea class="form-control" id="compose-body" placeholder="Body"></textarea>
-                <input type="submit" class="btn btn-primary"/>
+        <div id="content">
+            <h2>{{ account.name }}</h2>
+            <span>Balance: <h4 id="balance">{{ account.balance }}$</h4></span>
+            <button name="income" data-account-id="{{account.id}}" class="btn btn-outline-success">Add Income</button>
+            <button name="expense" data-account-id="{{account.id}}" class="btn btn-outline-danger">Add Expense</button>
+
+        </div>
+        <div class="form-popup" id="incomesForm">
+            <form class="form-container">
+                <h1>Add income</h1>
+              <label for="email"><b>Amount</b></label>
+              <input type="text" placeholder="Enter Amount $" name="email" required>
+              <button type="submit" class="btn">Submit</button>
+              <button type="submit" class="btn cancel" onclick="closeForm()">Close</button>
+            </form>
+        </div>
+        <div class="form-popup" id="expensesForm">
+            <form class="form-container">
+                <h1>Add expense</h1>
+              <label for="email"><b>Amount</b></label>
+              <input type="text" placeholder="Enter Amount $" name="email" required>
+              <button type="submit" class="btn">Submit</button>
+              <button type="submit" class="btn cancel" onclick="closeForm()">Close</button>
             </form>
         </div>
         {% endif %}

@@ -19,3 +19,6 @@ class PostTestCase(TestCase):
     def test_cat_count(self):
         u = User.objects.get(username="u1")
         self.assertEqual(Category.objects.all().count(), 1)
+
+    def test_cat_name(self):
+        self.assertEqual(Category.objects.get().name,"test")
