@@ -7,6 +7,7 @@ from django.db import IntegrityError
 
 from decimal import Decimal
 from .models import *
+from datetime import datetime
 
 # Create your views here. 
 def index(request):
@@ -114,6 +115,37 @@ def account(request, account):
             new_expense = Expense(account=user_account, amount=amount, category=category)
             balance = user_account.balance
             new_expense.save()
+            user_account.update_balance()
+            balance = user_account.balance
+            return JsonResponse({
+                    "account": account,
+                    "payment_amount": amount,
+                    "new balance": balance,
+                    "msg": "Expense added succesfully"
+            }, status=200)
+        elif request_type == "rec_expense":
+            user_account = user.accounts.get(name=account)
+            amount = Decimal(data.get("amount"))
+            category_name = data.get("category","Default")
+            str_date = data.get("start_date")
+            start_date = datetime.strptime(str_date, r'%Y-%m-%d')
+            schedule_type = data.get("schedule_type")
+            try:
+                category = Category.objects.get(name=category_name)
+            except:
+                return JsonResponse({"error": f"Category: {category_name}. Doesn't exist"}, status=400)
+            new_expense = RecurringPayment.objects.create(
+                account=user_account,
+                description="test",
+                amount=amount,
+                start_date=start_date,
+                schedule_type=schedule_type,
+                category=category,
+            )
+            # return JsonResponse({"msg":"idk"},status=200)
+            # balance = user_account.balance
+            # new_expense.save()
+            new_expense.update_childs()
             user_account.update_balance()
             balance = user_account.balance
             return JsonResponse({

@@ -1,5 +1,9 @@
-from django.db import models
+import datetime
 from django.contrib.auth.models import AbstractUser
+from django.db import models
+import calendar
+from django.utils import timezone
+from django.utils.timezone import make_aware
 
 # Create your models here.
 class User(AbstractUser):
@@ -16,6 +20,8 @@ class Account(models.Model):
     name = models.CharField(max_length= 50, blank=True)
 
     def update_balance(self):
+        for rec_expense in self.rec_expenses.all():
+            rec_expense.update_childs()
         incomes = sum([x.amount for x in Income.objects.filter(account = self)])
         expenses = sum([x.amount for x in Expense.objects.filter(account = self)])
         self.balance = incomes - expenses
@@ -24,8 +30,9 @@ class Account(models.Model):
 class Income(models.Model):
     account = models.ForeignKey("Account", on_delete=models.CASCADE, related_name="incomes")
     amount = models.DecimalField(decimal_places=3,max_digits=10)
-    added_date = models.DateTimeField(auto_now_add=True)
+    added_date = models.DateTimeField(default=timezone.now)
     category = models.ForeignKey(Category, on_delete=models.PROTECT, related_name="incomes")
+    recurring_parent = models.ForeignKey("RecurringIncome", on_delete=models.CASCADE, related_name="incomes", null=True, blank=True)
     def __str__(self):
         return f"account: {self.account.name},amount: {self.amount}, date{self.added_date}, category: {self.category.name}"
 
@@ -33,19 +40,58 @@ class Income(models.Model):
 class Expense(models.Model):
     account = models.ForeignKey("Account", on_delete=models.CASCADE, related_name="expenses")
     amount = models.DecimalField(decimal_places=3,max_digits=10)
-    added_date = models.DateTimeField(auto_now_add=True)
+    added_date = models.DateTimeField(default=timezone.now)
     category = models.ForeignKey(Category, on_delete=models.PROTECT,related_name="expenses")
+    recurring_parent = models.ForeignKey("RecurringPayment", on_delete=models.CASCADE, related_name="expenses", null=True, blank=True)
+    # def __str__(self):
+    #     return f"account: {self.account.name},amount: {self.amount}, date{self.added_date}, category: {self.category.name}"
+    def __str__(self):
+        return f"id: {self.id},amount: {self.amount}, date:{self.added_date}"
 
 
 class RecurringPayment(models.Model):
-    account = models.ForeignKey("Account", on_delete=models.CASCADE)
+    account = models.ForeignKey("Account", on_delete=models.CASCADE, related_name="rec_expenses")
     description = models.CharField(max_length=50)
     amount = models.DecimalField(decimal_places=3,max_digits=10)
     added_date = models.DateTimeField(auto_now_add=True)
-    start_date = models.DateTimeField()
-    end_date = models.DateTimeField()
+    start_date = models.DateField()
+    end_date = models.DateField(blank=True, null=True)
     schedule_type = models.CharField(max_length=50)
     category = models.ForeignKey(Category, on_delete=models.PROTECT, related_name="recpayments")
+    def cycles_at_date(self, date = timezone.now()):
+        if self.schedule_type == "Custom":
+            delta = date - self.start_date
+            return delta.days
+        elif self.schedule_type == "Monthly":
+            counter = 0
+            new_date = self.start_date
+            while new_date < date:
+                new_date = add_months(new_date,1)
+                if new_date > date:
+                    break
+                elif new_date <= date:
+                    counter += 1
+            return counter
+    
+    # Adds the necessary expenses based on the current amount 
+    def update_childs(self,date = timezone.now()):
+        cycles = self.cycles_at_date(date) 
+        expenses = self.expenses.all().count()
+        new_date = self.start_date
+        while (expenses <= cycles ):
+            if self.schedule_type == "Custom":
+                new_date = self.start_date + datetime.timedelta(days=expenses)
+            elif self.schedule_type == "Monthly":
+                new_date = add_months(self.start_date,expenses)
+            Expense.objects.create(
+                    account= self.account,
+                    amount = self.amount,
+                    added_date = make_aware(datetime.datetime.combine(new_date, datetime.datetime.min.time())),
+                    category = self.category,
+                    recurring_parent = self
+            ) 
+            expenses = self.expenses.all().count()
+            
     
 
 class RecurringIncome(models.Model):
@@ -53,7 +99,14 @@ class RecurringIncome(models.Model):
     description = models.CharField(max_length=50)
     amount = models.DecimalField(decimal_places=3,max_digits=10)
     added_date = models.DateTimeField(auto_now_add=True)
-    start_date = models.DateTimeField()
-    end_date = models.DateTimeField()
+    start_date = models.DateField()
+    end_date = models.DateField(blank=True, null=True)
     schedule_type = models.CharField(max_length=50)
     category = models.ForeignKey(Category, on_delete=models.PROTECT,related_name="recincomes")
+
+def add_months(sourcedate, months):
+    month = sourcedate.month - 1 + months
+    year = sourcedate.year + month // 12
+    month = month % 12 + 1
+    day = min(sourcedate.day, calendar.monthrange(year,month)[1])
+    return datetime.date(year, month, day)
