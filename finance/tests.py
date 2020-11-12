@@ -29,19 +29,6 @@ class PostTestCase(TestCase):
     def test_cat_name(self):
         self.assertEqual(Category.objects.get().name,"Default")
     
-    def test_rec_payment_cycles_daily(self):
-        rec_payment = RecurringPayment.objects.create(
-            account = Account.objects.get(),
-            description = "test",
-            category = Category.objects.get(),
-            amount = 10,
-            start_date = make_aware(datetime.datetime(2020,11,1)),
-            end_date = datetime.date(2021,11,1),
-            schedule_type = "Custom"
-        )
-        cycles = rec_payment.cycles_at_date(make_aware(datetime.datetime(2020,11,11)))
-        self.assertEqual(cycles,10)
-
     def test_rec_payment_cycles_monthly(self):
         rec_payment = RecurringPayment.objects.create(
             account = Account.objects.get(),
@@ -72,7 +59,7 @@ class PostTestCase(TestCase):
         )
         self.assertEqual(test.expenses.all().count(), 0)
         self.assertEqual(Expense.objects.filter(recurring_parent=test).count(), 0)
-        exp = Expense.objects.create(
+        Expense.objects.create(
                 account= test.account,
                 amount = test.amount,
                 added_date = make_aware(datetime.datetime(2020,11,1)),
@@ -83,23 +70,25 @@ class PostTestCase(TestCase):
         self.assertEqual(Expense.objects.filter(recurring_parent=test).count(), 1)
     
     def test_rec_payment_cycles_daily(self):
+        date = datetime.datetime(2020,11,1,tzinfo=timezone.get_current_timezone())
         test = RecurringPayment.objects.create(
             account = Account.objects.get(),
             description = "test",
             category = Category.objects.get(),
             amount = 10,
-            start_date = datetime.datetime(2020,11,1,tzinfo=timezone.get_current_timezone()),
+            start_date = date,
             schedule_type = "Custom"
         )
         self.assertEqual(test.expenses.all().count(), 0)
         test.update_childs()
+        # Checks if the first payment in the first child is the same as the start date
         self.assertEqual(test.start_date,test.expenses.order_by("added_date").first().added_date)
-        self.assertEqual(test.expenses.all().count(),timezone.now().day)
-        test.update_childs(datetime.datetime(2020,12,1,tzinfo=timezone.get_current_timezone()))
-        self.assertEqual(test.expenses.all().count(),31)
+        # Given that the schedule is daily, checks the number of childs is the same as the 
+        # difference in days + 1 (the first payment)
+        self.assertEqual(test.expenses.all().count(),(timezone.now() - date).days + 1)
         
     
-    def test_rec_payment_cycles_month(self):
+    def test_rec_payment_childs_monthly(self):
         rec_payment = RecurringPayment.objects.create(
             account = Account.objects.get(),
             description = "test",
@@ -115,6 +104,7 @@ class PostTestCase(TestCase):
         self.assertEqual(rec_payment.expenses.all().count(),2)
         rec_payment.update_childs(datetime.datetime(2021,11,1))
         self.assertEqual(rec_payment.expenses.all().count(),13)
+        
         test_date = rec_payment.start_date
         for exp in rec_payment.expenses.all():
             self.assertEqual(exp.added_date.date(), test_date.date())
