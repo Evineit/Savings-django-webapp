@@ -1,4 +1,5 @@
 import datetime
+from datetime import date, time
 from django.contrib.auth.models import AbstractUser
 from django.db import models
 import calendar
@@ -54,11 +55,13 @@ class RecurringPayment(models.Model):
     description = models.CharField(max_length=50)
     amount = models.DecimalField(decimal_places=3,max_digits=10)
     added_date = models.DateTimeField(auto_now_add=True)
-    start_date = models.DateField()
+    start_date = models.DateTimeField()
     end_date = models.DateField(blank=True, null=True)
     schedule_type = models.CharField(max_length=50)
     category = models.ForeignKey(Category, on_delete=models.PROTECT, related_name="recpayments")
-    def cycles_at_date(self, date = timezone.now()):
+
+    def cycles_at_date(self, date:datetime = timezone.now()) -> int:
+        if timezone.is_naive(date): date = make_aware(date)
         if self.schedule_type == "Custom":
             delta = date - self.start_date
             return delta.days
@@ -67,6 +70,16 @@ class RecurringPayment(models.Model):
             new_date = self.start_date
             while new_date < date:
                 new_date = add_months(new_date,1)
+                if new_date > date:
+                    break
+                elif new_date <= date:
+                    counter += 1
+            return counter
+        elif self.schedule_type == "Yearly":
+            counter = 0
+            new_date = self.start_date
+            while new_date < date:
+                new_date = add_months(new_date,12)
                 if new_date > date:
                     break
                 elif new_date <= date:
@@ -83,6 +96,8 @@ class RecurringPayment(models.Model):
                 new_date = self.start_date + datetime.timedelta(days=expenses)
             elif self.schedule_type == "Monthly":
                 new_date = add_months(self.start_date,expenses)
+            elif self.schedule_type == "Yearly":
+                new_date = add_months(self.start_date,expenses*12)
             Expense.objects.create(
                     account= self.account,
                     amount = self.amount,
@@ -109,4 +124,6 @@ def add_months(sourcedate, months):
     year = sourcedate.year + month // 12
     month = month % 12 + 1
     day = min(sourcedate.day, calendar.monthrange(year,month)[1])
-    return datetime.date(year, month, day)
+    if not isinstance(sourcedate, datetime.datetime):
+        return datetime.date(year, month, day)
+    return datetime.datetime(year, month, day, tzinfo=timezone.get_current_timezone())

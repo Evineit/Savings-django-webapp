@@ -1,5 +1,7 @@
 from datetime import time
+from decimal import Decimal
 import json
+from django.http.response import JsonResponse
 from django.test import TestCase, Client
 from django.core.paginator import Paginator
 from .models import *
@@ -17,7 +19,7 @@ class PostTestCase(TestCase):
         u3 = User.objects.create_user(username="u3", email="u3@seidai.com", password="pass1234")
     
         # Create posts.
-        cat_1 = Category.objects.create(name="test")
+        cat_1 = Category.objects.create(name="Default")
         acc = Account.objects.create(user=u1, name="default",balance=0)
         
     def test_cat_count(self):
@@ -25,7 +27,7 @@ class PostTestCase(TestCase):
         self.assertEqual(Category.objects.all().count(), 1)
 
     def test_cat_name(self):
-        self.assertEqual(Category.objects.get().name,"test")
+        self.assertEqual(Category.objects.get().name,"Default")
     
     def test_rec_payment_cycles_daily(self):
         rec_payment = RecurringPayment.objects.create(
@@ -33,11 +35,11 @@ class PostTestCase(TestCase):
             description = "test",
             category = Category.objects.get(),
             amount = 10,
-            start_date = datetime.date(2020,11,1),
+            start_date = make_aware(datetime.datetime(2020,11,1)),
             end_date = datetime.date(2021,11,1),
             schedule_type = "Custom"
         )
-        cycles = rec_payment.cycles_at_date(datetime.date(2020,11,11))
+        cycles = rec_payment.cycles_at_date(make_aware(datetime.datetime(2020,11,11)))
         self.assertEqual(cycles,10)
 
     def test_rec_payment_cycles_monthly(self):
@@ -46,15 +48,15 @@ class PostTestCase(TestCase):
             description = "test",
             category = Category.objects.get(),
             amount = 10,
-            start_date = datetime.date(2020,11,1),
+            start_date = make_aware(datetime.datetime(2020,11,1)),
             # end_date = datetime.date(2021,11,1),
             schedule_type = "Monthly"
         )
-        cycles = rec_payment.cycles_at_date(datetime.date(2020,11,11))
+        cycles = rec_payment.cycles_at_date(make_aware(datetime.datetime(2020,11,11)))
         self.assertEqual(cycles,0)
-        cycles = rec_payment.cycles_at_date(datetime.date(2020,12,1))
+        cycles = rec_payment.cycles_at_date(make_aware(datetime.datetime(2020,12,1)))
         self.assertEqual(cycles,1)
-        cycles = rec_payment.cycles_at_date(datetime.date(2021,11,1))
+        cycles = rec_payment.cycles_at_date(make_aware(datetime.datetime(2021,11,1)))
         self.assertEqual(cycles,12)
 
 
@@ -65,7 +67,7 @@ class PostTestCase(TestCase):
             description = "test",
             category = Category.objects.get(),
             amount = 10,
-            start_date = datetime.date(2020,11,1),
+            start_date = make_aware(datetime.datetime(2020,11,1)),
             schedule_type = "Custom"
         )
         self.assertEqual(test.expenses.all().count(), 0)
@@ -92,9 +94,8 @@ class PostTestCase(TestCase):
         self.assertEqual(test.expenses.all().count(), 0)
         test.update_childs()
         self.assertEqual(test.start_date,test.expenses.order_by("added_date").first().added_date)
-        self.assertEqual(test.expenses.all().count(),8)
+        self.assertEqual(test.expenses.all().count(),timezone.now().day)
         test.update_childs(datetime.datetime(2020,12,1,tzinfo=timezone.get_current_timezone()))
-        # print(test.expenses.all().last())
         self.assertEqual(test.expenses.all().count(),31)
         
     
@@ -104,21 +105,44 @@ class PostTestCase(TestCase):
             description = "test",
             category = Category.objects.get(),
             amount = 10,
-            start_date = datetime.date(2020,11,1),
+            start_date = make_aware(datetime.datetime(2020,11,1)),
             schedule_type = "Monthly"
         )
         self.assertEqual(rec_payment.expenses.all().count(), 0)
-        rec_payment.update_childs(datetime.date(2020,11,30))
+        rec_payment.update_childs(datetime.datetime(2020,11,30))
         self.assertEqual(rec_payment.expenses.all().count(),1)
-        rec_payment.update_childs(datetime.date(2020,12,1))
+        rec_payment.update_childs(datetime.datetime(2020,12,1))
         self.assertEqual(rec_payment.expenses.all().count(),2)
-        rec_payment.update_childs(datetime.date(2021,11,1))
+        rec_payment.update_childs(datetime.datetime(2021,11,1))
         self.assertEqual(rec_payment.expenses.all().count(),13)
         test_date = rec_payment.start_date
-        # print(rec_payment.expenses.all())
         for exp in rec_payment.expenses.all():
-            self.assertEqual(exp.added_date.date(), test_date)
+            self.assertEqual(exp.added_date.date(), test_date.date())
             test_date = add_months(test_date, 1)
+    
+    def test_server_fail_recurring_payments(self):
+        c = Client()
+        logged_in = c.login(username = 'u1',password="pass1234")
+        self.assertTrue(logged_in)
+        account = Account.objects.get()
+        response:JsonResponse = c.post('/accounts/'+account.name,content_type='application/json')
+        self.assertEqual(response.status_code, 400)
+
+    def test_server_recurring_payments(self):
+        c = Client()
+        logged_in = c.login(username = 'u1',password="pass1234")
+        self.assertTrue(logged_in)
+        response = c.post('/accounts/default',data={
+            'type': 'rec_expense',
+            'amount': '15',
+            'description': 'test',
+            'start_date': '2020-11-01',
+            'schedule_type': 'Custom'
+        }, content_type='application/json')
+        response_2 = c.get('/accounts/default')
+        self.assertEqual(response.status_code, 201)
+        self.assertLess(Decimal(response_2.json().get('balance')),0)
+
 
 
 

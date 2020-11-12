@@ -103,7 +103,7 @@ def account(request, account):
                     "payment_amount": amount,
                     "new balance": balance,
                     "msg": "Income added succesfully"
-            }, status=200)
+            }, status=201)
         elif request_type == "expense":
             user_account = user.accounts.get(name=account)
             amount = Decimal(data.get("amount"))
@@ -122,7 +122,7 @@ def account(request, account):
                     "payment_amount": amount,
                     "new balance": balance,
                     "msg": "Expense added succesfully"
-            }, status=200)
+            }, status=201)
         elif request_type == "rec_expense":
             user_account = user.accounts.get(name=account)
             amount = Decimal(data.get("amount"))
@@ -138,13 +138,10 @@ def account(request, account):
                 account=user_account,
                 description="test",
                 amount=amount,
-                start_date=start_date,
+                start_date=make_aware(start_date),
                 schedule_type=schedule_type,
                 category=category,
             )
-            # return JsonResponse({"msg":"idk"},status=200)
-            # balance = user_account.balance
-            # new_expense.save()
             new_expense.update_childs()
             user_account.update_balance()
             balance = user_account.balance
@@ -153,14 +150,14 @@ def account(request, account):
                     "payment_amount": amount,
                     "new balance": balance,
                     "msg": "Expense added succesfully"
-            }, status=200)
+            }, status=201)
     elif request.method == "GET":
         user_account = user.accounts.get(name=account)
         user_account.update_balance()
         balance = user_account.balance
         return JsonResponse({
             "balance": balance
-        }, status=201)
+        }, status=200)
         pass
     else:
         return JsonResponse({"error": "POST or GET request required."}, status=400)
