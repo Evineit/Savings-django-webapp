@@ -53,6 +53,8 @@ DELETE /expenses/<int:id>
 - Delete the selected item info
 
 ---------------------------------------------------------------------
+GET /recpayments/<str:account>
+- Get all the recurrent expenses of given account
 
 GET /recpayments/<int:id>
 - Get the selected item info
@@ -83,6 +85,7 @@ It fulfills the following requirements:
 
 * Subscriptions: Allow users to add subscriptions as recurring expenses.
     Users also can add recurring incomes for a better forecast in their budget
+    View active subscriptions
 
 * Categories: Allow users categorize the payments in common categories.
     There should be a quick add button for incomes and expenses in every category.
@@ -90,4 +93,8 @@ It fulfills the following requirements:
 * Forecast: When a user clicks on Forecast, the user should be taken to a view where they see a text based forecast of the balance
     in the selected account given the recurring payments.
 
+** Movements History
+
 ** Graphs: Allow users to view a graph of the balance of the selected month.
+
+** Wallets (accounts)

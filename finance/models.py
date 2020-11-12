@@ -60,6 +60,19 @@ class RecurringPayment(models.Model):
     schedule_type = models.CharField(max_length=50)
     category = models.ForeignKey(Category, on_delete=models.PROTECT, related_name="recpayments")
 
+    def serialize(self):
+        return {
+            "id": self.id,
+            "description": self.description,
+            "amount": self.amount,
+            "category": self.category.name,
+            # "added_date": maybe,
+            "start_date": self.start_date.strftime("%b %-d %Y, %-I:%M %p"),
+            # "end_date": self.end_date.strftime("%b %-d %Y, %-I:%M %p"),
+            # "next_date": maybe ,
+            "schedule_type": self.schedule_type,
+        }
+
     def cycles_at_date(self, date:datetime = timezone.now()) -> int:
         if timezone.is_naive(date): date = make_aware(date)
         if self.schedule_type == "Custom":

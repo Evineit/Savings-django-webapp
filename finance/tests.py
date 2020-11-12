@@ -130,8 +130,10 @@ class PostTestCase(TestCase):
             'schedule_type': 'Custom'
         }, content_type='application/json')
         response_2 = c.get('/accounts/default')
+        response_3 = c.get('/recpayments/default')
         self.assertEqual(response.status_code, 201)
         self.assertLess(Decimal(response_2.json().get('balance')),0)
+        self.assertEqual(response_3.status_code, 200)
 
 
 
