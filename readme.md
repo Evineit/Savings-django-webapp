@@ -81,6 +81,7 @@ It fulfills the following requirements:
     View active subscriptions, including the next payment date, a description or title, the type of schedule
 
 * Movements History
+    Should it be handle in json format or in the database
 
 * Categories: Allow users categorize the payments in common categories.
     There should be a quick add button for incomes and expenses in every category.

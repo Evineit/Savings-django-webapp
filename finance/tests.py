@@ -22,6 +22,7 @@ class PostTestCase(TestCase):
         cat_1 = Category.objects.create(name="Default")
         acc = Account.objects.create(user=u1, name="default",balance=0)
         
+        
     def test_cat_count(self):
         u = User.objects.get(username="u1")
         self.assertEqual(Category.objects.all().count(), 1)
@@ -134,6 +135,33 @@ class PostTestCase(TestCase):
         self.assertEqual(response.status_code, 201)
         self.assertLess(Decimal(response_2.json().get('balance')),0)
         self.assertEqual(response_3.status_code, 200)
+
+    def test_server_recurring_payments_stop(self):
+        c = Client()
+        logged_in = c.login(username = 'u1',password="pass1234")
+        self.assertTrue(logged_in)
+        c.post('/accounts/default',data={
+            'type': 'rec_expense',
+            'amount': '15',
+            'description': 'test',
+            'start_date': '2020-11-01',
+            'schedule_type': 'Custom'
+        }, content_type='application/json')
+        response = c.get('/recpayments/default')
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(response.json()), 1)
+        pay_id = response.json()[0].get("id")
+        rec_pay_response = c.get('recpayments/' +  str(pay_id)) 
+        self.assertEqual(rec_pay_response.status_code,200)    
+        stop_response = c.put('recpayments/' + pay_id, data={
+            'action': 'stop',
+            'remove_last_movement': False
+        })
+        self.assertEqual(stop_response.status_code, 200)
+        response = c.get('/recpayments/default')
+        self.assertEqual(len(response.json()), 0)
+
+
 
 
 
