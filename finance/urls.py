@@ -8,5 +8,6 @@ urlpatterns = [
     path("register", views.register, name="register"),
     
     path("accounts/<str:account>",views.account, name="account"),
+    path("recpayments/<int:id>",views.rec_payment, name="rec_payment"),
     path("recpayments/<str:account_name>",views.all_rec_payments, name="all_rec_payments"),
 ]

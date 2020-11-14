@@ -56,7 +56,7 @@ class RecurringPayment(models.Model):
     amount = models.DecimalField(decimal_places=3,max_digits=10)
     added_date = models.DateTimeField(auto_now_add=True)
     start_date = models.DateTimeField()
-    end_date = models.DateField(blank=True, null=True)
+    end_date = models.DateTimeField(blank=True, null=True)
     schedule_type = models.CharField(max_length=50)
     category = models.ForeignKey(Category, on_delete=models.PROTECT, related_name="recpayments")
 
@@ -76,6 +76,8 @@ class RecurringPayment(models.Model):
     def cycles_at_date(self, date:datetime = timezone.now()) -> int:
         if timezone.is_naive(date): date = make_aware(date)
         if self.schedule_type == "Custom":
+            if self.end_date and date > self.end_date:
+                return self.end_date - self.start_date
             delta = date - self.start_date
             return delta.days
         elif self.schedule_type == "Monthly":
@@ -83,6 +85,8 @@ class RecurringPayment(models.Model):
             new_date = self.start_date
             while new_date < date:
                 new_date = add_months(new_date,1)
+                if self.end_date and new_date > self.end_date:
+                    break
                 if new_date > date:
                     break
                 elif new_date <= date:
@@ -93,6 +97,8 @@ class RecurringPayment(models.Model):
             new_date = self.start_date
             while new_date < date:
                 new_date = add_months(new_date,12)
+                if self.end_date and new_date > self.end_date:
+                    break
                 if new_date > date:
                     break
                 elif new_date <= date:
@@ -104,6 +110,7 @@ class RecurringPayment(models.Model):
         cycles = self.cycles_at_date(date) 
         expenses = self.expenses.all().count()
         new_date = self.start_date
+        
         while (expenses <= cycles ):
             if self.schedule_type == "Custom":
                 new_date = self.start_date + datetime.timedelta(days=expenses)
