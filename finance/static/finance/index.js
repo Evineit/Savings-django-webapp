@@ -1,24 +1,11 @@
 document.addEventListener('DOMContentLoaded', function() {
     reload_subs()
-    
-    document.querySelector('button[name="income"]').onclick = () => {
-        closeForm()
-        openForm("incomes")
-    }
-    document.querySelector('button[name="expense"]').onclick = () => {
-        closeForm()
-        openForm("expenses")
-    }
-    document.querySelector('button[name="recexpense"]').onclick = () => {
-        
-        document.getElementById("start").setAttribute("min", today());
-        document.getElementById("start").setAttribute("value", today());
-        closeForm()
-        openForm("recexpenses")
-    }
+    set_buttons()
     document.querySelector('#incomesForm>form').onsubmit = () => {
         const account_name = document.querySelector('#content>h2').innerHTML;
         const amount = document.querySelector('#incomesForm>form>input').value;
+        document.querySelector('#incomesForm>form>input').value = null;
+
 
         // Send a POST request to the URL
         let csrftoken = getCookie('csrftoken');
@@ -37,15 +24,11 @@ document.addEventListener('DOMContentLoaded', function() {
                 response.json()
                 console.log(response)
             })
-            .then(result => {
-                // Print result
-                console.log(result);
-            })
             // Catch any errors and log them to the console
             .catch(error => {
                 console.log('Error:', error);
             });
-        console.log("test submit income")
+        // console.log("test submit income")
         reload_balance(account_name)
         closeForm()
 
@@ -54,6 +37,7 @@ document.addEventListener('DOMContentLoaded', function() {
     document.querySelector('#expensesForm>form').onsubmit = () => {
         const account_name = document.querySelector('#content>h2').innerHTML;
         const amount = document.querySelector('#expensesForm>form>input').value;
+        document.querySelector('#expensesForm>form>input').value = null;
 
         // Send a POST request to the URL
         let csrftoken = getCookie('csrftoken');
@@ -80,7 +64,7 @@ document.addEventListener('DOMContentLoaded', function() {
             .catch(error => {
                 console.log('Error:', error);
             });
-        console.log("test submit expense")
+        // console.log("test submit expense")
         closeForm()
         reload_balance(account_name)
         return false
@@ -91,6 +75,7 @@ document.addEventListener('DOMContentLoaded', function() {
         const amount = document.querySelector('#recexpensesForm>form>input').value;
         const start_date = document.getElementById("start").value
         const schedule_type = document.getElementById("schedule_type").value
+        reset_recexpense()
         // Send a POST request to the URL
         let csrftoken = getCookie('csrftoken');
         fetch('/accounts/'+account_name, {
@@ -111,23 +96,38 @@ document.addEventListener('DOMContentLoaded', function() {
             .then(response => {
                 response.json()
                 console.log(response)
-            })
-            .then(result => {
-                // Print result
-                console.log(result);
+                if (response.status == 200) reload_balance(account_name)
             })
             // Catch any errors and log them to the console
             .catch(error => {
                 console.log('Error:', error);
             });
-        console.log("test submit expense")
-        reload_balance(account_name)
+        // console.log("test submit rec_expense")
+        // reload_balance(account_name)
         reload_subs()
         closeForm()
 
         return false
     }
 });
+
+function set_buttons() {
+    document.querySelector('button[name="income"]').onclick = () => {
+        closeForm()
+        openForm("incomes")
+    }
+    document.querySelector('button[name="expense"]').onclick = () => {
+        closeForm()
+        openForm("expenses")
+    }
+    document.querySelector('button[name="recexpense"]').onclick = () => {
+        reset_recexpense()
+        
+        
+        closeForm()
+        openForm("recexpenses")
+    }
+}
 
 // The following function is from 
 // https://docs.djangoproject.com/en/dev/ref/csrf/#ajax
@@ -168,7 +168,7 @@ function reload_balance(account_name) {
 }
 
 function reload_subs() {
-    const subs_div = document.querySelector(".subs")
+    const subs_div = document.querySelector(".subs-container")
     subs_div.innerHTML = ''
     const account_name = document.querySelector('#content>h2').innerHTML;
     fetch('/recpayments/' + account_name)
@@ -176,14 +176,22 @@ function reload_subs() {
         .then(payments => {
             payments.forEach(payment => {
                 const element = document.createElement('div')
+                element.className = "subs"
                 const title = document.createElement('h6')
                 // const amount = document.createElement('h6')
                 title.innerHTML = `${payment.description}, ${payment.amount}$, Schedule:${payment.schedule_type}`;
                 element.append(title)
                 // element.append(amount)
-                document.querySelector(".subs").append(element)
+                document.querySelector(".subs-container").append(element)
             });
         });
+}
+
+function reset_recexpense(){
+    document.querySelector('#recexpensesForm>form>input').value = null;
+
+    document.getElementById("start").setAttribute("min", today());
+    document.getElementById("start").setAttribute("value", today());
 }
 
 function today() {
