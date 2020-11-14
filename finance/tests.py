@@ -136,6 +136,37 @@ class PostTestCase(TestCase):
         self.assertLess(Decimal(response_2.json().get('balance')),0)
         self.assertEqual(response_3.status_code, 200)
 
+    def test_server_recurring_payments_get_actives(self):
+        c = Client()
+        logged_in = c.login(username = 'u1',password="pass1234")
+        self.assertTrue(logged_in)
+        rec_payment_active = RecurringPayment.objects.create(
+            account = Account.objects.get(),
+            description = "test",
+            category = Category.objects.get(),
+            amount = 10,
+            start_date = make_aware(datetime.datetime(2020,9,1)),
+            schedule_type = "Monthly"
+        )
+        rec_payment_inactive = RecurringPayment.objects.create(
+            account = Account.objects.get(),
+            description = "test",
+            category = Category.objects.get(),
+            amount = 10,
+            start_date = make_aware(datetime.datetime(2020,9,1)),
+            end_date = make_aware(datetime.datetime(2020,10,1)),
+            schedule_type = "Monthly"
+        )
+        response_payments = c.get('/recpayments/default')
+        # Assert only 1 RecurringPayment is active
+        self.assertEqual(response_payments.status_code, 200)
+        self.assertEqual(len(response_payments.json()), 1)
+        # Updates the childs at the time
+        c.get('/accounts/default')
+        self.assertGreaterEqual(rec_payment_active.expenses.count(),3)
+        self.assertEqual(rec_payment_inactive.expenses.count(),2)
+
+
     def test_server_recurring_payments_stop(self):
         c = Client()
         logged_in = c.login(username = 'u1',password="pass1234")
@@ -150,13 +181,14 @@ class PostTestCase(TestCase):
         response = c.get('/recpayments/default')
         self.assertEqual(response.status_code, 200)
         self.assertEqual(len(response.json()), 1)
+
         pay_id = response.json()[0].get("id")
-        rec_pay_response = c.get('recpayments/' +  str(pay_id)) 
+        rec_pay_response = c.get('/recpayments/' +  str(pay_id)) 
         self.assertEqual(rec_pay_response.status_code,200)    
-        stop_response = c.put('recpayments/' + pay_id, data={
+        stop_response = c.put('/recpayments/' + str(pay_id), data={
             'action': 'stop',
             'remove_last_movement': False
-        })
+        }, content_type='application/json')
         self.assertEqual(stop_response.status_code, 200)
         response = c.get('/recpayments/default')
         self.assertEqual(len(response.json()), 0)
