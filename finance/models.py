@@ -69,7 +69,7 @@ class RecurringPayment(models.Model):
             # "added_date": maybe,
             "start_date": self.start_date.strftime("%b %-d %Y, %-I:%M %p"),
             # "end_date": self.end_date.strftime("%b %-d %Y, %-I:%M %p"),
-            # "next_date": maybe ,
+            "next_date": self.next_payment_date().strftime(r"%d %b %Y") ,
             "schedule_type": self.schedule_type,
         }
 
@@ -127,6 +127,16 @@ class RecurringPayment(models.Model):
                     recurring_parent = self
             ) 
             expenses = self.expenses.all().count()
+    def next_payment_date(self, date= timezone.now()):
+        cycles = self.cycles_at_date(date) + 1
+        new_date = self.start_date
+        if self.schedule_type == "Custom":
+            new_date = self.start_date + datetime.timedelta(days=cycles)
+        elif self.schedule_type == "Monthly":
+            new_date = add_months(self.start_date,cycles)
+        elif self.schedule_type == "Yearly":
+            new_date = add_months(self.start_date,cycles*12)
+        return make_aware(datetime.datetime.combine(new_date, datetime.datetime.min.time()))
             
     
 

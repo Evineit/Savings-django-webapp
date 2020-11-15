@@ -191,7 +191,8 @@ function reload_subs() {
                     stop_payment(payment.id)
                 })
 
-                title.innerHTML = `id: ${payment.id}, ${payment.description}, ${payment.amount}$, Schedule:${payment.schedule_type}`;
+                title.innerHTML = `id: ${payment.id}, ${payment.description}, ${payment.amount}$, Schedule:${payment.schedule_type}
+                , Next payment date: ${payment.next_date}`;
                 element.append(title)
                 element.append(stop_button)
                 // element.append(amount)
