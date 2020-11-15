@@ -165,6 +165,26 @@ class PostTestCase(TestCase):
         c.get('/accounts/default')
         self.assertGreaterEqual(rec_payment_active.expenses.count(),3)
         self.assertEqual(rec_payment_inactive.expenses.count(),2)
+        rec_payment_active = RecurringPayment.objects.create(
+            account = Account.objects.get(),
+            description = "test",
+            category = Category.objects.get(),
+            amount = 10,
+            start_date = make_aware(datetime.datetime(2020,9,1)),
+            end_date = make_aware(datetime.datetime(2020,10,1)),
+            schedule_type = "Custom"
+        )
+        rec_payment_active = RecurringPayment.objects.create(
+            account = Account.objects.get(),
+            description = "test",
+            category = Category.objects.get(),
+            amount = 10,
+            start_date = make_aware(datetime.datetime(2020,9,1)),
+            end_date = make_aware(datetime.datetime(2021,10,1)),
+            schedule_type = "Yearly"
+        )
+        c.get('/accounts/default')
+
 
 
     def test_server_recurring_payments_stop(self):

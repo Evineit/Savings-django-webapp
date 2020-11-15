@@ -77,7 +77,8 @@ class RecurringPayment(models.Model):
         if timezone.is_naive(date): date = make_aware(date)
         if self.schedule_type == "Custom":
             if self.end_date and date > self.end_date:
-                return self.end_date - self.start_date
+                delta = self.end_date - self.start_date
+                return delta.days
             delta = date - self.start_date
             return delta.days
         elif self.schedule_type == "Monthly":
