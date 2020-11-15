@@ -96,7 +96,11 @@ document.addEventListener('DOMContentLoaded', function() {
             .then(response => {
                 response.json()
                 console.log(response)
-                if (response.status == 200) reload_balance(account_name)
+                if (response.status == 201){
+                    reload_balance(account_name)
+                    reload_subs()
+                } 
+                
             })
             // Catch any errors and log them to the console
             .catch(error => {
@@ -104,7 +108,7 @@ document.addEventListener('DOMContentLoaded', function() {
             });
         // console.log("test submit rec_expense")
         // reload_balance(account_name)
-        reload_subs()
+        
         closeForm()
 
         return false
@@ -176,20 +180,55 @@ function reload_subs() {
         .then(payments => {
             payments.forEach(payment => {
                 const element = document.createElement('div')
-                element.className = "subs"
                 const title = document.createElement('h6')
-                // const amount = document.createElement('h6')
-                title.innerHTML = `${payment.description}, ${payment.amount}$, Schedule:${payment.schedule_type}`;
+                const stop_button = document.createElement('button')
+                element.className = "subs"
+                element.dataset.id = payment.id
+                stop_button.innerText = "Stop"
+                stop_button.className = "btn btn-danger"
+                stop_button.addEventListener('click', () =>{
+                    hide_payment(element)
+                    stop_payment(payment.id)
+                })
+
+                title.innerHTML = `id: ${payment.id}, ${payment.description}, ${payment.amount}$, Schedule:${payment.schedule_type}`;
                 element.append(title)
+                element.append(stop_button)
                 // element.append(amount)
                 document.querySelector(".subs-container").append(element)
             });
         });
 }
 
+function stop_payment(payment_id){
+    let csrftoken = getCookie('csrftoken');
+    fetch('/recpayments/'+payment_id,{
+        method: 'PUT',
+        body: JSON.stringify({
+            action: 'stop',
+            remove_last_movement: false,
+        }),
+        headers:{
+            "X-CSRFToken": csrftoken
+        }
+    })
+    .then( result => {
+        // reload_subs()
+    })
+    .catch( error => {
+        console.log('Error:', error);
+    })
+}
+
+function hide_payment(element){
+    element.style.animationPlayState = 'running'
+    setTimeout(() => {
+        element.remove()
+    }, 3000);
+}
+
 function reset_recexpense(){
     document.querySelector('#recexpensesForm>form>input').value = null;
-
     document.getElementById("start").setAttribute("min", today());
     document.getElementById("start").setAttribute("value", today());
 }
