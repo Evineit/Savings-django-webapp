@@ -213,6 +213,37 @@ class PostTestCase(TestCase):
         response = c.get('/recpayments/default')
         self.assertEqual(len(response.json()), 0)
 
+    def test_server_recurring_payment_next_payment_date(self):
+        rec_payment_1 = RecurringPayment.objects.create(
+            account = Account.objects.get(),
+            description = "test",
+            category = Category.objects.get(),
+            amount = 10,
+            start_date = make_aware(datetime.datetime(2020,10,1)),
+            end_date = make_aware(datetime.datetime(2020,11,1)),
+            schedule_type = "Custom"
+        )
+        rec_payment_2 = RecurringPayment.objects.create(
+            account = Account.objects.get(),
+            description = "test",
+            category = Category.objects.get(),
+            amount = 10,
+            start_date = make_aware(datetime.datetime(2020,9,1)),
+            end_date = make_aware(datetime.datetime(2021,11,1)),
+            schedule_type = "Monthly"
+        )
+        rec_payment_3 = RecurringPayment.objects.create(
+            account = Account.objects.get(),
+            description = "test",
+            category = Category.objects.get(),
+            amount = 10,
+            start_date = make_aware(datetime.datetime(2020,9,1)),
+            end_date = make_aware(datetime.datetime(2021,11,1)),
+            schedule_type = "Yearly"
+        )
+        self.assertEqual(rec_payment_1.next_payment_date().date(),datetime.date(2020,11,2))
+        self.assertEqual(rec_payment_2.next_payment_date().date(),datetime.date(2020,12,1))
+        self.assertEqual(rec_payment_3.next_payment_date().date(),datetime.date(2021,9,1))
 
 
 
