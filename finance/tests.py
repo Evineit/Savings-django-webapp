@@ -81,15 +81,15 @@ class PostTestCase(TestCase):
             schedule_type = "Custom"
         )
         self.assertEqual(test.expenses.all().count(), 0)
-        test.update_childs()
+        test.update_children()
         # Checks if the first payment in the first child is the same as the start date
         self.assertEqual(test.start_date,test.expenses.order_by("added_date").first().added_date)
-        # Given that the schedule is daily, checks the number of childs is the same as the 
+        # Given that the schedule is daily, checks the number of children is the same as the 
         # difference in days + 1 (the first payment)
         self.assertEqual(test.expenses.all().count(),(timezone.now() - date).days + 1)
         
     
-    def test_rec_payment_childs_monthly(self):
+    def test_rec_payment_children_monthly(self):
         rec_payment = RecurringPayment.objects.create(
             account = Account.objects.get(),
             description = "test",
@@ -99,11 +99,11 @@ class PostTestCase(TestCase):
             schedule_type = "Monthly"
         )
         self.assertEqual(rec_payment.expenses.all().count(), 0)
-        rec_payment.update_childs(datetime.datetime(2020,11,30))
+        rec_payment.update_children(datetime.datetime(2020,11,30))
         self.assertEqual(rec_payment.expenses.all().count(),1)
-        rec_payment.update_childs(datetime.datetime(2020,12,1))
+        rec_payment.update_children(datetime.datetime(2020,12,1))
         self.assertEqual(rec_payment.expenses.all().count(),2)
-        rec_payment.update_childs(datetime.datetime(2021,11,1))
+        rec_payment.update_children(datetime.datetime(2021,11,1))
         self.assertEqual(rec_payment.expenses.all().count(),13)
         
         test_date = rec_payment.start_date
@@ -161,7 +161,7 @@ class PostTestCase(TestCase):
         # Assert only 1 RecurringPayment is active
         self.assertEqual(response_payments.status_code, 200)
         self.assertEqual(len(response_payments.json()), 1)
-        # Updates the childs at the time
+        # Updates the children at the time
         c.get('/accounts/default')
         self.assertGreaterEqual(rec_payment_active.expenses.count(),3)
         self.assertEqual(rec_payment_inactive.expenses.count(),2)

@@ -104,7 +104,7 @@ def account(request, account):
                     "account": account,
                     "payment_amount": amount,
                     "new balance": balance,
-                    "msg": "Income added succesfully"
+                    "msg": "Income added successfully"
             }, status=201)
         elif request_type == "expense":
             user_account = user.accounts.get(name=account)
@@ -123,7 +123,7 @@ def account(request, account):
                     "account": account,
                     "payment_amount": amount,
                     "new balance": balance,
-                    "msg": "Expense added succesfully"
+                    "msg": "Expense added successfully"
             }, status=201)
         elif request_type == "rec_expense":
             user_account = user.accounts.get(name=account)
@@ -144,14 +144,14 @@ def account(request, account):
                 schedule_type=schedule_type,
                 category=category,
             )
-            new_expense.update_childs()
+            new_expense.update_children()
             user_account.update_balance()
             balance = user_account.balance
             return JsonResponse({
                     "account": account,
                     "payment_amount": amount,
                     "new balance": balance,
-                    "msg": "Expense added succesfully"
+                    "msg": "Expense added successfully"
             }, status=201)
     elif request.method == "GET":
         user_account = user.accounts.get(name=account)

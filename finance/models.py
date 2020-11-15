@@ -22,7 +22,7 @@ class Account(models.Model):
 
     def update_balance(self):
         for rec_expense in self.rec_expenses.all():
-            rec_expense.update_childs()
+            rec_expense.update_children()
         incomes = sum([x.amount for x in Income.objects.filter(account = self)])
         expenses = sum([x.amount for x in Expense.objects.filter(account = self)])
         self.balance = incomes - expenses
@@ -106,7 +106,7 @@ class RecurringPayment(models.Model):
             return counter
     
     # Adds the necessary expenses based on the current amount 
-    def update_childs(self,date = timezone.now()):
+    def update_children(self,date = timezone.now()):
         cycles = self.cycles_at_date(date) 
         expenses = self.expenses.all().count()
         new_date = self.start_date
