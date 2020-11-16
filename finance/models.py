@@ -8,7 +8,9 @@ from django.utils.timezone import make_aware
 
 # Create your models here.
 class User(AbstractUser):
-    pass
+    def del_accounts(self):
+        for account in self.accounts.all():
+            account.remove()
 
 class Category(models.Model):
     name = models.CharField(max_length=50)
@@ -32,7 +34,7 @@ class Income(models.Model):
     account = models.ForeignKey("Account", on_delete=models.CASCADE, related_name="incomes")
     amount = models.DecimalField(decimal_places=3,max_digits=10)
     added_date = models.DateTimeField(default=timezone.now)
-    category = models.ForeignKey(Category, on_delete=models.PROTECT, related_name="incomes")
+    category = models.ForeignKey(Category, on_delete=models.CASCADE, related_name="incomes")
     recurring_parent = models.ForeignKey("RecurringIncome", on_delete=models.CASCADE, related_name="incomes", null=True, blank=True)
     def __str__(self):
         return f"account: {self.account.name},amount: {self.amount}, date{self.added_date}, category: {self.category.name}"
@@ -42,7 +44,7 @@ class Expense(models.Model):
     account = models.ForeignKey("Account", on_delete=models.CASCADE, related_name="expenses")
     amount = models.DecimalField(decimal_places=3,max_digits=10)
     added_date = models.DateTimeField(default=timezone.now)
-    category = models.ForeignKey(Category, on_delete=models.PROTECT,related_name="expenses")
+    category = models.ForeignKey(Category, on_delete=models.CASCADE,related_name="expenses")
     recurring_parent = models.ForeignKey("RecurringPayment", on_delete=models.CASCADE, related_name="expenses", null=True, blank=True)
     # def __str__(self):
     #     return f"account: {self.account.name},amount: {self.amount}, date{self.added_date}, category: {self.category.name}"
@@ -58,7 +60,7 @@ class RecurringPayment(models.Model):
     start_date = models.DateTimeField()
     end_date = models.DateTimeField(blank=True, null=True)
     schedule_type = models.CharField(max_length=50)
-    category = models.ForeignKey(Category, on_delete=models.PROTECT, related_name="recpayments")
+    category = models.ForeignKey(Category, on_delete=models.CASCADE, related_name="recpayments")
 
     def serialize(self):
         return {
@@ -148,7 +150,7 @@ class RecurringIncome(models.Model):
     start_date = models.DateField()
     end_date = models.DateField(blank=True, null=True)
     schedule_type = models.CharField(max_length=50)
-    category = models.ForeignKey(Category, on_delete=models.PROTECT,related_name="recincomes")
+    category = models.ForeignKey(Category, on_delete=models.CASCADE,related_name="recincomes")
 
 def add_months(sourcedate, months):
     month = sourcedate.month - 1 + months

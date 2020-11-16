@@ -5,6 +5,10 @@ body {
   font-weight: 700;
 }
 
+div#content {
+  text-align: center;
+}
+
 div.subs-container {
   margin: 5px;
   padding: 5px;
@@ -58,6 +62,9 @@ div.subs-container .subs {
 
 /* The popup form - hidden by default */
 .form-popup {
+  overflow-block: scroll;
+  left: 50%;
+  transform: translate(-50%);
   display: none;
   border: 3px solid #f1f1f1;
   outline: none;
@@ -70,13 +77,15 @@ div.subs-container .subs {
 
 /* Add styles to the form container */
 .form-container {
+  min-width: 30vw;
   max-width: 40vw;
   padding: 10px;
   background-color: white;
 }
 
 /* Full-width input fields */
-.form-container input[type=text], .form-container input[type=password] {
+.form-container input[type=text],
+.form-container input[type=password] {
   width: 100%;
   padding: 15px;
   margin: 5px 0 22px 0;
@@ -85,7 +94,8 @@ div.subs-container .subs {
 }
 
 /* When the inputs get focus, do something */
-.form-container input[type=text]:focus, .form-container input[type=password]:focus {
+.form-container input[type=text]:focus,
+.form-container input[type=password]:focus {
   background-color: #ddd;
   outline: none;
 }
@@ -108,8 +118,20 @@ div.subs-container .subs {
 }
 
 /* Add some hover effects to buttons */
-.form-container .btn:hover, .open-button:hover {
+.form-container .btn:hover,
+.open-button:hover {
   opacity: 1;
+}
+
+@media only screen and (max-height: 600px) {
+  .form-popup {
+    position: relative;
+  }
+
+  .form-container {
+    width: 100vw;
+    max-width: none;
+  }
 }
 
 /*# sourceMappingURL=styles.css.map */

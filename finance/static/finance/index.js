@@ -22,14 +22,17 @@ document.addEventListener('DOMContentLoaded', function() {
             })
             .then(response => {
                 response.json()
-                console.log(response)
+                if (response.status == 201){
+                    // console.log(response)
+                    reload_balance(account_name)
+                    }
+
             })
             // Catch any errors and log them to the console
             .catch(error => {
                 console.log('Error:', error);
             });
         // console.log("test submit income")
-        reload_balance(account_name)
         closeForm()
 
         return false

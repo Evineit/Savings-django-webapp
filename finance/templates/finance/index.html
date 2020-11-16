@@ -21,7 +21,7 @@
                 <h1>Add income</h1>
               <label for="email"><b>Amount</b></label>
               <input type="text" placeholder="Enter Amount $" name="email" required>
-              <button type="submit" class="btn">Submit</button>
+              <button type="submit" class="btn">Done</button>
               <button type="button" class="btn cancel" onclick="closeForm()">Close</button>
             </form>
         </div>
@@ -30,8 +30,8 @@
                 <h1>Add expense</h1>
               <label for="email"><b>Amount</b></label>
               <input type="text" placeholder="Enter Amount $" name="email" required>
-              <button type="submit" class="btn">Submit</button>
-              <button type="button" class="btn cancel" onsubmit="closeForm()">Close</button>
+              <button type="submit" class="btn">Done</button>
+              <button type="button" class="btn cancel" onclick="closeForm()">Close</button>
             </form>
         </div>
         <div class="form-popup" id="recexpensesForm">
@@ -45,7 +45,7 @@
                     </div>
                     <select class="custom-select" name="cycle" id="schedule_type">
                         <!-- Custom option for testing purposes -->
-                        <option value="Custom">(Debug) Daily</option>
+                        <!-- <option value="Custom">(Debug) Daily</option> -->
                         <option value="Monthly">Monthly</option>
                         <option value="Yearly">Yearly</option>
                     </select>
@@ -58,13 +58,13 @@
                         value="2018-07-22"
                         min="2018-01-01">
                 </div>
-                <button type="submit" class="btn">Submit</button>
+                <button type="submit" class="btn">Done</button>
                 <button type="button" class="btn cancel" onclick="closeForm()">Close</button>
             </form>
         </div>
         <br>
         <h3>Active Subscriptions</h3>
-        <div class="subs-container">
+        <div class="subs-container rounded border">
             
         </div>
         {% endif %}
