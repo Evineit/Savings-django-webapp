@@ -129,6 +129,7 @@ def account(request, account):
             user_account = user.accounts.get(name=account)
             amount = Decimal(data.get("amount"))
             category_name = data.get("category","Default")
+            description = data.get("description","No description")
             str_date = data.get("start_date")
             start_date = datetime.strptime(str_date, r'%Y-%m-%d')
             schedule_type = data.get("schedule_type")
@@ -138,7 +139,7 @@ def account(request, account):
                 return JsonResponse({"error": f"Category: {category_name}. Doesn't exist"}, status=400)
             new_expense = RecurringPayment.objects.create(
                 account=user_account,
-                description="test",
+                description=description,
                 amount=amount,
                 start_date=make_aware(start_date),
                 schedule_type=schedule_type,

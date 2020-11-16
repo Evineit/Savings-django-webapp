@@ -77,7 +77,8 @@ document.addEventListener('DOMContentLoaded', function() {
 
     document.querySelector('#recexpensesForm>form').onsubmit = () => {
         const account_name = document.querySelector('#content>h2').innerHTML;
-        const amount = document.querySelector('#recexpensesForm>form>input').value;
+        const title = document.querySelector('#recexpensesForm>form>input[name="title"]').value;
+        const amount = document.querySelector('#recexpensesForm>form>input[name="amount"]').value;
         const start_date = document.getElementById("start").value
         const schedule_type = document.getElementById("schedule_type").value
         reset_recexpense()
@@ -89,7 +90,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     type: "rec_expense",
                     amount: amount,
                     // Change or remove
-                    description: "test",
+                    description: title,
                     start_date: start_date,
                     schedule_type: schedule_type,
                 }),
