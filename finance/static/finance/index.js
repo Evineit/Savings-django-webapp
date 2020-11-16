@@ -1,7 +1,7 @@
 document.addEventListener('DOMContentLoaded', function() {
     reload_subs()
     set_buttons()
-    document.querySelector('#incomesForm>form').onsubmit = () => {
+    document.querySelector('#incomesForm>form').onsubmit = function() {
         const account_name = document.querySelector('#content>h2').innerHTML;
         const amount = document.querySelector('#incomesForm>form>input').value;
         document.querySelector('#incomesForm>form>input').value = null;
@@ -54,7 +54,10 @@ document.addEventListener('DOMContentLoaded', function() {
             })
             .then(response => {
                 response.json()
-                console.log(response)
+                if (response.status == 201){
+                // console.log(response)
+                reload_balance(account_name)
+                }
             })
             .then(result => {
                 // Print result
@@ -66,7 +69,6 @@ document.addEventListener('DOMContentLoaded', function() {
             });
         // console.log("test submit expense")
         closeForm()
-        reload_balance(account_name)
         return false
     }
 
@@ -126,8 +128,6 @@ function set_buttons() {
     }
     document.querySelector('button[name="recexpense"]').onclick = () => {
         reset_recexpense()
-        
-        
         closeForm()
         openForm("recexpenses")
     }
