@@ -149,10 +149,8 @@ def account(request, account):
             user_account.update_balance()
             balance = user_account.balance
             return JsonResponse({
-                    "account": account,
-                    "payment_amount": amount,
-                    "new balance": balance,
-                    "msg": "Expense added successfully"
+                    "sub": new_expense.serialize(),
+                    "msg": "Subscription added successfully"
             }, status=201)
     elif request.method == "GET":
         user_account = user.accounts.get(name=account)
@@ -161,7 +159,6 @@ def account(request, account):
         return JsonResponse({
             "balance": balance
         }, status=200)
-        pass
     else:
         return JsonResponse({"error": "POST or GET request required."}, status=400)
         

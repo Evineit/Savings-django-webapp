@@ -28,6 +28,12 @@ div.subs-container .subs {
   animation-fill-mode: forwards;
   animation-play-state: paused;
 }
+div.subs-container .btn-hidden {
+  visibility: hidden;
+}
+div.subs-container .subs:hover .btn-hidden {
+  visibility: visible;
+}
 
 @keyframes hide {
   0% {
@@ -62,7 +68,7 @@ div.subs-container .subs {
 
 /* The popup form - hidden by default */
 .form-popup {
-  overflow-block: scroll;
+  overflow: auto;
   left: 50%;
   transform: translate(-50%);
   display: none;
@@ -127,6 +133,9 @@ div.subs-container .subs {
 @media only screen and (max-height: 600px) {
   .form-popup {
     position: relative;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
   }
 
   .form-container {

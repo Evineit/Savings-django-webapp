@@ -76,14 +76,15 @@ It fulfills the following requirements:
     Only the amount is needed
 
 * Subscriptions: Allow users to add subscriptions as recurring expenses.
-    Users also can add recurring incomes for a better forecast in their budget
     Users should be able to stop a subscription without deleting the previous payments
     View active subscriptions, including the next payment date, a description or title, the type of schedule
+    User should be able to edit the current subscription amount, influencing next payments
+    Users also can add recurring incomes for a better forecast in their budget
 
 * Movements History
     Should it be handle in json format or in the database
 
-* Categories: Allow users categorize the payments in common categories.
+** Categories: Allow users categorize the payments in common categories.
     There should be a quick add button for incomes and expenses in every category.
     
 

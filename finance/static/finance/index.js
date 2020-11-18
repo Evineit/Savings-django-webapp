@@ -1,12 +1,10 @@
 document.addEventListener('DOMContentLoaded', function() {
-    reload_subs()
+    const account_name = document.querySelector('#content>h2').innerHTML;
+    reload_subs(account_name)
     set_buttons()
     document.querySelector('#incomesForm>form').onsubmit = function() {
-        const account_name = document.querySelector('#content>h2').innerHTML;
         const amount = document.querySelector('#incomesForm>form>input').value;
         document.querySelector('#incomesForm>form>input').value = null;
-
-
         // Send a POST request to the URL
         let csrftoken = getCookie('csrftoken');
         fetch('/accounts/'+account_name, {
@@ -23,25 +21,19 @@ document.addEventListener('DOMContentLoaded', function() {
             .then(response => {
                 response.json()
                 if (response.status == 201){
-                    // console.log(response)
                     reload_balance(account_name)
                     }
-
             })
             // Catch any errors and log them to the console
             .catch(error => {
                 console.log('Error:', error);
             });
-        // console.log("test submit income")
         closeForm()
-
         return false
     }
     document.querySelector('#expensesForm>form').onsubmit = () => {
-        const account_name = document.querySelector('#content>h2').innerHTML;
         const amount = document.querySelector('#expensesForm>form>input').value;
         document.querySelector('#expensesForm>form>input').value = null;
-
         // Send a POST request to the URL
         let csrftoken = getCookie('csrftoken');
         fetch('/accounts/'+account_name, {
@@ -56,27 +48,20 @@ document.addEventListener('DOMContentLoaded', function() {
                 credentials: "include"
             })
             .then(response => {
-                response.json()
+                // response.json()
                 if (response.status == 201){
-                // console.log(response)
-                reload_balance(account_name)
+                    reload_balance(account_name)
                 }
-            })
-            .then(result => {
-                // Print result
-                console.log(result);
             })
             // Catch any errors and log them to the console
             .catch(error => {
                 console.log('Error:', error);
             });
-        // console.log("test submit expense")
         closeForm()
         return false
     }
 
     document.querySelector('#recexpensesForm>form').onsubmit = () => {
-        const account_name = document.querySelector('#content>h2').innerHTML;
         const title = document.querySelector('#recexpensesForm>form>input[name="title"]').value;
         const amount = document.querySelector('#recexpensesForm>form>input[name="amount"]').value;
         const start_date = document.getElementById("start").value
@@ -100,23 +85,18 @@ document.addEventListener('DOMContentLoaded', function() {
                 credentials: "include"
             })
             .then(response => {
-                response.json()
-                console.log(response)
-                if (response.status == 201){
-                    reload_balance(account_name)
-                    reload_subs()
-                } 
-                
+                if (response.ok){
+                    response.json().then(result =>{
+                        new_sub = create_sub(result.sub)
+                        document.querySelector(".subs-container").prepend(new_sub)
+                    })
+                }
             })
             // Catch any errors and log them to the console
             .catch(error => {
                 console.log('Error:', error);
-            });
-        // console.log("test submit rec_expense")
-        // reload_balance(account_name)
-        
+            });        
         closeForm()
-
         return false
     }
 });
@@ -175,34 +155,37 @@ function reload_balance(account_name) {
         });
 }
 
-function reload_subs() {
+function reload_subs(account_name) {
     const subs_div = document.querySelector(".subs-container")
     subs_div.innerHTML = ''
-    const account_name = document.querySelector('#content>h2').innerHTML;
     fetch('/recpayments/' + account_name)
         .then(response => response.json())
         .then(payments => {
             payments.forEach(payment => {
-                const element = document.createElement('div')
-                const title = document.createElement('h6')
-                const stop_button = document.createElement('button')
-                element.className = "subs"
-                element.dataset.id = payment.id
-                stop_button.innerText = "Stop"
-                stop_button.className = "btn btn-danger"
-                stop_button.addEventListener('click', () =>{
-                    hide_payment(element)
-                    stop_payment(payment.id)
-                })
-
-                title.innerHTML = `id: ${payment.id}, ${payment.description}, ${payment.amount}$, Schedule:${payment.schedule_type}
-                , Next payment date: ${payment.next_date}`;
-                element.append(title)
-                element.append(stop_button)
-                // element.append(amount)
-                document.querySelector(".subs-container").append(element)
+                new_sub = create_sub(payment)
+                document.querySelector(".subs-container").append(new_sub)
             });
         });
+}
+
+function create_sub(payment){
+    const element = document.createElement('div')
+    const title = document.createElement('h6')
+    const stop_button = document.createElement('button')
+    element.className = "subs"
+    element.dataset.id = payment.id
+    stop_button.innerText = "Stop"
+    stop_button.className = "btn btn-danger btn-hidden"
+    stop_button.addEventListener('click', () =>{
+        hide_payment(element)
+        stop_payment(payment.id)
+    })
+
+    title.innerHTML = `id: ${payment.id}, ${payment.description}, ${payment.amount}$, Schedule:${payment.schedule_type}
+    , Next payment date: ${payment.next_date}`;
+    element.append(title)
+    element.append(stop_button)  
+    return element  
 }
 
 function stop_payment(payment_id){
@@ -216,9 +199,6 @@ function stop_payment(payment_id){
         headers:{
             "X-CSRFToken": csrftoken
         }
-    })
-    .then( result => {
-        // reload_subs()
     })
     .catch( error => {
         console.log('Error:', error);
