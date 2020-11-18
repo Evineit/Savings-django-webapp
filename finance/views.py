@@ -175,30 +175,29 @@ def all_rec_payments(request, account_name):
         return JsonResponse({"error": "GET request required."}, status=400)
 
 def rec_payment(request, id):
-    # user = request.user
+    try:
+            payment = RecurringPayment.objects.get(id=id)
+    except:
+            return JsonResponse({"error": f"Payment with id: {id}. Doesn't exist"}, status=400) 
     if request.method == "GET":
-        try:
-                payment = RecurringPayment.objects.get(id=id)
-        except:
-                return JsonResponse({"error": f"Payment with id: {id}. Doesn't exist"}, status=400) 
         return JsonResponse(payment.serialize(), safe=False, status=200 ) 
     elif request.method == "PUT":
         data = json.loads(request.body)
-        if not data:
-            return JsonResponse({"error": "Empty PUT request"}, status=400)
-        
+        if not data: return JsonResponse({"error": "Empty PUT request"}, status=400)
         action = data.get("action")
-        if not action:
-            return JsonResponse({"error": "No action in request"}, status=400)
+        if not action: return JsonResponse({"error": "No action in request"}, status=400)
+
         if action == "stop":
-            try:
-                payment = RecurringPayment.objects.get(id=id)
-            except:
-                return JsonResponse({"error": f"Payment with id: {id}. Doesn't exist"}, status=400)  
             payment.end_date = timezone.now()
             payment.save()
             return JsonResponse({"msg": f"Payment with id: {id}. Has been stopped"}, status=200)
-        
+        elif action == "change_amount":
+            new_amount = data.get("amount")
+            if not new_amount: return JsonResponse({"error": "No amount in request"}, status=400)
+            payment.amount =  new_amount
+            payment.save()
+            return JsonResponse({"msg": f"Payment with id: {id}. Has a new amount{new_amount}"}, status=200)
+        else: return JsonResponse({"error":f"Action:{action} doesn't exist"}, status=400) 
     else:
         return JsonResponse({"error": "GET or PUT request required."}, status=400)
 
