@@ -175,7 +175,7 @@ function create_sub(payment){
     element.className = "subs"
     element.dataset.id = payment.id
     stop_button.innerText = "Stop"
-    stop_button.className = "btn btn-danger btn-hidden"
+    stop_button.className = "btn btn-outline-danger btn-hidden"
     stop_button.addEventListener('click', () =>{
         hide_payment(element)
         stop_payment(payment.id)
