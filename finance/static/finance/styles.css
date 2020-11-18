@@ -28,9 +28,15 @@ div.subs-container .subs {
   animation-duration: 2s;
   animation-fill-mode: forwards;
   animation-play-state: paused;
+  display: flex;
+  flex-direction: column;
+}
+div.subs-container .subs .subs-top-container {
+  display: flex;
 }
 div.subs-container .btn-hidden {
   visibility: hidden;
+  margin-right: 5px;
 }
 div.subs-container .subs:hover .btn-hidden {
   visibility: visible;
@@ -80,6 +86,9 @@ div.subs-container .subs:hover .btn-hidden {
   max-height: 649px;
   max-width: 1284px;
   z-index: 2202;
+}
+.form-popup label, .form-popup h1, .form-popup h4 {
+  color: #202020;
 }
 
 /* Add styles to the form container */

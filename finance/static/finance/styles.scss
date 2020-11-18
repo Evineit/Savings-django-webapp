@@ -7,7 +7,7 @@ body {
   font-family: "roboto", sans-serif;
   font-weight: 700;
 
-  // padding: 5px;
+  
 }
 
 div#content {
@@ -33,9 +33,18 @@ div.subs-container {
     animation-duration: 2s;
     animation-fill-mode: forwards;
     animation-play-state: paused;
+    display: flex;
+    flex-direction: column;
+    .subs-top-container{
+      display: flex;
+    }
+    // .subs-bot-container{
+
+    // }
   }
   .btn-hidden{
     visibility: hidden;
+    margin-right: 5px;
   }
   .subs:hover .btn-hidden{
     visibility: visible;
@@ -94,6 +103,9 @@ div.subs-container {
   max-height: 649px;
   max-width: 1284px;
   z-index: 2202;
+  label, h1, h4 {
+    color: #202020;
+  }
 }
 /* Add styles to the form container */
 .form-container {

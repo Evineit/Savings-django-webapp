@@ -196,8 +196,13 @@ def rec_payment(request, id):
             if not new_amount: return JsonResponse({"error": "No amount in request"}, status=400)
             payment.amount =  new_amount
             payment.save()
-            return JsonResponse({"msg": f"Payment with id: {id}. Has a new amount{new_amount}"}, status=200)
-        else: return JsonResponse({"error":f"Action:{action} doesn't exist"}, status=400) 
+            payment.refresh_from_db()
+            return JsonResponse({
+                "msg": f"Payment with id: {id}. Has a new amount{new_amount}",
+                "amount": payment.amount
+            }, status=200)
+        else: 
+            return JsonResponse({"error":f"Action:{action} doesn't exist"}, status=400) 
     else:
         return JsonResponse({"error": "GET or PUT request required."}, status=400)
 

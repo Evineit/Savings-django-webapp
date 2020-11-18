@@ -2,6 +2,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const account_name = document.querySelector('#content>h2').innerHTML;
     reload_subs(account_name)
     set_buttons()
+    
     document.querySelector('#incomesForm>form').onsubmit = function() {
         const amount = document.querySelector('#incomesForm>form>input').value;
         document.querySelector('#incomesForm>form>input').value = null;
@@ -170,22 +171,70 @@ function reload_subs(account_name) {
 
 function create_sub(payment){
     const element = document.createElement('div')
+    const top_div = document.createElement('div')
+    const bot_div = document.createElement('div')
     const title = document.createElement('h6')
+    const amount = document.createElement('h6')
     const stop_button = document.createElement('button')
+    const amount_button = document.createElement('button')
     element.className = "subs"
+    top_div.className = "subs-top-container"
     element.dataset.id = payment.id
+    title.style = "flex: 1;"
     stop_button.innerText = "Stop"
     stop_button.className = "btn btn-outline-danger btn-hidden"
     stop_button.addEventListener('click', () =>{
         hide_payment(element)
         stop_payment(payment.id)
     })
+    amount_button.innerText = "Change amount"
+    amount_button.className = "btn btn-outline-primary btn-hidden"
+    amount_button.addEventListener('click', () =>{
+        change_amount(payment.id, amount)
+    })
 
-    title.innerHTML = `id: ${payment.id}, ${payment.description}, ${payment.amount}$, Schedule:${payment.schedule_type}
+    title.innerHTML = `id: ${payment.id}, ${payment.description}, Schedule:${payment.schedule_type}
     , Next payment date: ${payment.next_date}`;
-    element.append(title)
-    element.append(stop_button)  
+    amount.innerHTML = `Amount:${payment.amount}$`
+    top_div.append(title)
+    top_div.append(amount)
+    bot_div.append(amount_button)  
+    bot_div.append(stop_button)  
+    element.append(top_div)
+    element.append(bot_div)
+
     return element  
+}
+
+function change_amount(payment_id, amount_elem){
+    document.getElementById("amount_form").style.display = "block";
+    document.querySelector('#amount_form>form').onsubmit = function() {
+        const amount = document.querySelector('#amount_form>form>input').value;
+        document.querySelector('#amount_form>form>input').value = null;
+        let csrftoken = getCookie('csrftoken');
+        fetch('/recpayments/'+payment_id,{
+            method: 'PUT',
+            body: JSON.stringify({
+                action: 'change_amount',
+                amount: amount,
+            }),
+            headers:{
+                "X-CSRFToken": csrftoken
+            }
+        })
+        .then( response =>{
+            closeForm()
+            if (response.ok){
+                response.json().then(result =>{
+                    amount_elem.innerHTML = `Amount:${result.amount}$`
+                })
+            }
+        })
+        .catch( error => {
+            console.log('Error:', error);
+        })
+        return false
+    }
 }
 
 function stop_payment(payment_id){
