@@ -244,6 +244,35 @@ class PostTestCase(TestCase):
         self.assertEqual(rec_payment_1.next_payment_date().date(),datetime.date(2020,11,2))
         self.assertEqual(rec_payment_2.next_payment_date().date(),datetime.date(2020,12,1))
         self.assertEqual(rec_payment_3.next_payment_date().date(),datetime.date(2021,9,1))
+    
+    def test_server_recurring_payments_change_amount(self):
+        c = Client()
+        logged_in = c.login(username = 'u1',password="pass1234")
+        self.assertTrue(logged_in)
+        c.post('/accounts/default',data={
+            'type': 'rec_expense',
+            'amount': '15',
+            'description': 'test',
+            'start_date': '2020-11-01',
+            'schedule_type': 'Custom'
+        }, content_type='application/json')
+        response = c.get('/recpayments/default')
+        self.assertEqual(response.status_code, 200)
+        pay_id = response.json()[0].get("id")
+        change_amount_response = c.put('/recpayments/' + str(pay_id), data={
+            'action': 'change_amount',
+            'amount': 100
+        }, content_type='application/json')
+        self.assertEqual(change_amount_response.status_code, 200)
+        rec_pay_response = c.get('/recpayments/' +  str(pay_id)) 
+        self.assertEqual(rec_pay_response.status_code,200) 
+        self.assertEqual(Decimal(rec_pay_response.json().get('amount')),Decimal(100)) 
+        rec_payment_1 = RecurringPayment.objects.get(pk=pay_id)
+        rec_payment_1.update_children(timezone.now()+timezone.timedelta(days=1))
+        child_last = rec_payment_1.expenses.order_by("-id")[0]
+        other_child = rec_payment_1.expenses.order_by("-id")[1]
+        self.assertEqual(Decimal(child_last.amount),Decimal(100))
+        self.assertEqual(Decimal(other_child.amount),Decimal(15))
 
 
 
