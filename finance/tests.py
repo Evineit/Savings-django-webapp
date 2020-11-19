@@ -21,6 +21,17 @@ class PostTestCase(TestCase):
         # Create posts.
         cat_1 = Category.objects.create(name="Default")
         acc = Account.objects.create(user=u1, name="default",balance=0)
+
+    def test_server_create_wallet(self):
+        c = Client()
+        logged_in = c.login(username = 'u1',password="pass1234")
+        self.assertTrue(logged_in)
+        response = c.post('/accounts/',data={
+            'title': 'new_wallet',
+            'amount': '15',
+        }, content_type='application/json')
+        self.assertEqual(response.status_code,201)
+
         
         
     def test_cat_count(self):
