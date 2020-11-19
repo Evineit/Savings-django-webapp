@@ -14,7 +14,7 @@ div#content {
 div.subs-container {
   margin: 5px;
   background-color: #171717;
-  height: 40vh;
+  height: 50vh;
   overflow: auto;
   text-align: justify;
 }
@@ -79,7 +79,6 @@ div.subs-container .subs:hover .btn-hidden {
   left: 50%;
   transform: translate(-50%);
   display: none;
-  border: 3px solid #f1f1f1;
   outline: none;
   position: fixed;
   box-sizing: border-box;
@@ -101,6 +100,7 @@ div.subs-container .subs:hover .btn-hidden {
 
 /* Full-width input fields */
 .form-container input[type=text],
+.form-container input[type=number],
 .form-container input[type=password] {
   width: 100%;
   padding: 15px;
@@ -111,6 +111,7 @@ div.subs-container .subs:hover .btn-hidden {
 
 /* When the inputs get focus, do something */
 .form-container input[type=text]:focus,
+.form-container input[type=number]:focus,
 .form-container input[type=password]:focus {
   background-color: #ddd;
   outline: none;

@@ -3,85 +3,82 @@
 
 
 {% block body %}
-    <h1>{{finance}}</h1>
-    <div>
-        {% if user.is_authenticated %}
-        <div id="content">
-            <h2>{{ account.name }}</h2>
-            <span>Balance: <h4 id="balance">{{ account.balance }}$</h4></span>
-            <button name="income" data-account-id="{{account.id}}" class="btn btn-outline-success">Add Income</button>
-            <button name="expense" data-account-id="{{account.id}}" class="btn btn-outline-danger">Add Expense</button>
-            <button name="recexpense" data-account-id="{{account.id}}" class="btn btn-outline-danger">Add Subscription</button>
-
-
-
-        </div>
-        <div class="form-popup" id="incomesForm">
-            <form class="form-container">
-                <h1>Add income</h1>
-              <label for="email"><b>Amount</b></label>
-              <input type="text" placeholder="Enter Amount $" name="email" required>
-              <button type="submit" class="btn">Done</button>
-              <button type="button" class="btn cancel" onclick="closeForm()">Close</button>
-            </form>
-        </div>
-        <div class="form-popup" id="expensesForm">
-            <form class="form-container">
-                <h1>Add expense</h1>
-              <label for="email"><b>Amount</b></label>
-              <input type="text" placeholder="Enter Amount $" name="email" required>
-              <button type="submit" class="btn">Done</button>
-              <button type="button" class="btn cancel" onclick="closeForm()">Close</button>
-            </form>
-        </div>
-        <div class="form-popup" id="recexpensesForm">
-            <form class="form-container">
-                <h1>Add subscription</h1>
-                <label for="title"><b>Title</b></label>
-                <input type="text" placeholder="Enter title" name="title" required>
+<h1>{{finance}}</h1>
+<div>
+    {% if user.is_authenticated %}
+    <div id="content">
+        <h2>{{ account.name }}</h2>
+        <span>Balance: <h4 id="balance">{{ account.balance }}$</h4></span>
+        <button name="income" data-account-id="{{account.id}}" class="btn btn-outline-success">Add Income</button>
+        <button name="expense" data-account-id="{{account.id}}" class="btn btn-outline-danger">Add Expense</button>
+        <button name="recexpense" data-account-id="{{account.id}}" class="btn btn-outline-danger">Add
+            Subscription</button>
+    </div>
+    <div class="form-popup" id="incomesForm">
+        <form class="form-container rounded">
+            <h1>Add income</h1>
+            <label for="amount"><b>Amount</b></label>
+            <input type="number" min=1 placeholder="Enter Amount $" name="amount" required>
+            <button type="submit" class="btn">Done</button>
+            <button type="button" class="btn cancel" onclick="closeForm()">Close</button>
+        </form>
+    </div>
+    <div class="form-popup" id="expensesForm">
+        <form class="form-container rounded">
+            <h1>Add expense</h1>
+            <label for="amount"><b>Amount</b></label>
+            <input type="number" min=1 placeholder="Enter Amount $" name="amount" required>
+            <button type="submit" class="btn">Done</button>
+            <button type="button" class="btn cancel" onclick="closeForm()">Close</button>
+        </form>
+    </div>
+    <div class="form-popup" id="recexpensesForm">
+        <form class="form-container rounded">
+            <h1>Add subscription</h1>
+            <label for="title"><b>Title</b></label>
+            <input type="text" placeholder="Enter title" name="title" required>
+            <label for="amount"><b>Amount</b></label>
+            <input type="number" min=1 placeholder="Enter Amount $" name="amount" required>
+            <div class="input-group mb-3">
+                <div class="input-group-prepend">
+                    <label class="input-group-text" for="inputGroupSelect01">Repeat</label>
+                </div>
+                <select class="custom-select" name="cycle" id="schedule_type">
+                    <!-- Custom option for testing purposes -->
+                    <!-- <option value="Custom">(Debug) Daily</option> -->
+                    <option value="Monthly">Monthly</option>
+                    <option value="Yearly">Yearly</option>
+                </select>
+            </div>
+            <div class="input-group mb-3">
+                <div class="input-group-prepend">
+                    <label class="input-group-text" for="start">Start date:</label>
+                </div>
+                <input class="custom-select" type="date" id="start" name="trip-start" value="2018-07-22"
+                    min="2018-01-01">
+            </div>
+            <button type="submit" class="btn">Done</button>
+            <button type="button" class="btn cancel" onclick="closeForm()">Close</button>
+        </form>
+    </div>
+    <div class="form-popup" id="amount_form">
+        <form class="form-container rounded">
+            <h4>Change amount</h1>
                 <label for="amount"><b>Amount</b></label>
-                <input type="text" placeholder="Enter Amount $" name="amount" required>
-                <div class="input-group mb-3">
-                    <div class="input-group-prepend">
-                      <label class="input-group-text" for="inputGroupSelect01">Repeat</label>
-                    </div>
-                    <select class="custom-select" name="cycle" id="schedule_type">
-                        <!-- Custom option for testing purposes -->
-                        <!-- <option value="Custom">(Debug) Daily</option> -->
-                        <option value="Monthly">Monthly</option>
-                        <option value="Yearly">Yearly</option>
-                    </select>
-                </div>
-                <div class="input-group mb-3">
-                    <div class="input-group-prepend">
-                        <label class="input-group-text" for="start">Start date:</label>
-                    </div>
-                    <input class="custom-select" type="date" id="start" name="trip-start"
-                        value="2018-07-22"
-                        min="2018-01-01">
-                </div>
+                <input type="number" min=1 placeholder="Enter Amount $" name="amount" required>
                 <button type="submit" class="btn">Done</button>
                 <button type="button" class="btn cancel" onclick="closeForm()">Close</button>
-            </form>
-        </div>
-        <div class="form-popup" id="amount_form">
-            <form class="form-container">
-              <h4>Change amount</h1>
-              <label for="amount"><b>Amount</b></label>
-              <input type="text" placeholder="Enter Amount $" name="amount" required>
-              <button type="submit" class="btn">Done</button>
-              <button type="button" class="btn cancel" onclick="closeForm()">Close</button>
-            </form>
-        </div>
-        <br>
-        <h3>Active Subscriptions</h3>
-        <div class="subs-container rounded">
-            
-        </div>
-        {% endif %}
+        </form>
     </div>
+    <br>
+    <h3>Active Subscriptions</h3>
+    <div class="subs-container rounded">
+
+    </div>
+    {% endif %}
+</div>
 {% endblock %}
 
 {% block script %}
-    <script src="{% static 'finance/index.js' %}"></script>
+<script src="{% static 'finance/index.js' %}"></script>
 {% endblock %}

@@ -72,16 +72,21 @@ DELETE /recincomes/<int:id>
 Implementation of single-page-app finance client using JavaScript, HTML, and CSS. 
 It fulfills the following requirements:
 
-* Quick add: Allow users to add incomes and expenses to the current account quickly.
-    Only the amount is needed
+* Quickly add incomes and expenses: Allow users to add incomes and expenses to the current account balance quickly.
+    - Only the amount is needed to add an income/expense where balance is affected
 
 * Subscriptions: Allow users to add subscriptions as recurring expenses.
-    Users should be able to stop a subscription without deleting the previous payments
-    View active subscriptions, including the next payment date, a description or title, the type of schedule
-    User should be able to edit the current subscription amount, influencing next payments
-    Users also can add recurring incomes for a better forecast in their budget
+    - Recurring payments should have at least 2 types of scheduling (monthly, yearly)
+    - View active subscriptions, including the next payment date, a description/title and the type of schedule
 
-* Movements History
+* Update recurring payments: Users should be able edit any of their own payments.
+    - Users should be able to stop a subscription without deleting the previous payments.
+    - Stopping or changing the amount on a recurring payment shouldn't reload the page.
+    - User should be able to edit the current subscription amount, influencing next payments
+  
+** Recurring incomes: Users can add recurring incomes for a better forecast in their budget
+
+** Movements History
     Should it be handle in json format or in the database
 
 ** Categories: Allow users categorize the payments in common categories.
@@ -90,7 +95,6 @@ It fulfills the following requirements:
 
 ** Forecast: When a user clicks on Forecast, the user should be taken to a view where they see a text based forecast of the balance
     in the selected account given the recurring payments.
-
 
 ** Graphs: Allow users to view a graph of the balance of the selected month.
 
