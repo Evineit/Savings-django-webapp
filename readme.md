@@ -13,26 +13,32 @@ You’ll get to add/delete accounts, add/delete expenses, add/delete incomes, ad
 
 This application supports the following API routes:
 
-GET /accounts/
-- Get user accounts
+<!-- GET /accounts/
+- Get user accounts -->
 
 POST /accounts/
 - Add new account/wallet
 
 GET /accounts/<str:account>
-- Get Account info
-- Responds a Json with account info like balance
+- Get Account info (Balance)
+<!-- - Responds a Json with account info like balance -->
 
-DELETE /accounts/<str:account>
-- Delete Account | Confirmation needed | checkbox
+<!-- DELETE /accounts/<str:account>
+- Delete Account | Confirmation needed | checkbox -->
 
 POST /accounts/<str:account>
 - Add new expense, income, recurring payment, recurring income.
 - Receives JSON with {type, amount, extra info}
 
+GET /accounts/<str:account>/recpayments
+- Get all the recurrent expenses of given account
+
+<!-- GET /accounts/<str:account>/recincomes
+- Get all the recurrent incomes of given account -->
+
 ------------------------------------------------------------------- 
 
-GET /incomes/<int:id>
+<!-- GET /incomes/<int:id>
 - Get the selected item info
 
 GET /expenses/<int:id>
@@ -44,27 +50,26 @@ DELETE /incomes/<int:id>
 DELETE /expenses/<int:id>
 - Delete the selected item info
 
----------------------------------------------------------------------
-GET /recpayments/<str:account>
-- Get all the recurrent expenses of given account
+--------------------------------------------------------------------- -->
 
 GET /recpayments/<int:id>
-- Get the selected item info
-
-GET /recincomes/<int:id>
 - Get the selected item info
 
 PUT /recpayments/<int:id>
 - Updates the selected item info
 
-PUT /recincomes/<int:id>
+<!-- DELETE /recpayments/<int:id>
+- Deletes the selected item info -->
+
+<!-- GET /recincomes/<int:id>
+- Get the selected item info -->
+
+<!-- PUT /recincomes/<int:id>
 - Updates the selected item info
 
-DELETE /recpayments/<int:id>
-- Deletes the selected item info
 
 DELETE /recincomes/<int:id>
-- Deletes the selected item info
+- Deletes the selected item info -->
 
 
 
@@ -82,7 +87,10 @@ It fulfills the following requirements:
     - Recurring payments should have at least 2 types of scheduling (monthly, yearly)
     - View active subscriptions, including the next payment date, a description/title and the type of schedule
 
-** Wallets (accounts)
+* Wallets (accounts): Users can add new accounts
+    - Accounts should have independent balance and payments
+    - User should be able to change between accounts without reloading
+    <!-- TODO: Users should only be able to interact with their on things-->
 
 * Update recurring payments: Users should be able edit any of their own payments.
     - Users should be able to stop a subscription without deleting the previous payments.
