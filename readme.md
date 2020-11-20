@@ -75,9 +75,14 @@ It fulfills the following requirements:
 * Quickly add incomes and expenses: Allow users to add incomes and expenses to the current account balance quickly.
     - Only the amount is needed to add an income/expense where balance is affected
 
+    **** - Animated balance change 
+    <!-- https://css-tricks.com/animating-number-counters/#the-new-school-css-solution -->
+
 * Subscriptions: Allow users to add subscriptions as recurring expenses.
     - Recurring payments should have at least 2 types of scheduling (monthly, yearly)
     - View active subscriptions, including the next payment date, a description/title and the type of schedule
+
+** Wallets (accounts)
 
 * Update recurring payments: Users should be able edit any of their own payments.
     - Users should be able to stop a subscription without deleting the previous payments.
@@ -92,10 +97,8 @@ It fulfills the following requirements:
 ** Categories: Allow users categorize the payments in common categories.
     There should be a quick add button for incomes and expenses in every category.
     
-
 ** Forecast: When a user clicks on Forecast, the user should be taken to a view where they see a text based forecast of the balance
     in the selected account given the recurring payments.
 
 ** Graphs: Allow users to view a graph of the balance of the selected month.
 
-** Wallets (accounts)

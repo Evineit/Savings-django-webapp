@@ -26,11 +26,16 @@ class PostTestCase(TestCase):
         c = Client()
         logged_in = c.login(username = 'u1',password="pass1234")
         self.assertTrue(logged_in)
-        response = c.post('/accounts/',data={
+        response = c.post('/accounts',data={
             'title': 'new_wallet',
             'amount': '15',
         }, content_type='application/json')
         self.assertEqual(response.status_code,201)
+        response = c.get('/accounts/new_wallet')
+        self.assertEqual(response.status_code,200)
+        self.assertEqual(Decimal(response.json().get("balance")),Decimal(15))
+
+
 
         
         
