@@ -22,6 +22,17 @@ class PostTestCase(TestCase):
         cat_1 = Category.objects.create(name="Default")
         acc = Account.objects.create(user=u1, name="default",balance=0)
 
+    def test_server_account_name(self):
+        u1 = User.objects.get(username="u1")
+        Account.objects.create(user=u1, name="123",balance=0)
+        c = Client()
+        logged_in = c.login(username = 'u1',password="pass1234")
+        self.assertTrue(logged_in)
+        account_name = "123"
+        response = c.get('/recpayments/'+account_name)
+        self.assertEqual(response.status_code,200)
+        self.assertEqual(len(response.json()), 0)
+
     def test_server_create_wallet(self):
         c = Client()
         logged_in = c.login(username = 'u1',password="pass1234")
