@@ -81,16 +81,23 @@ def register(request):
 def account(request):
     user = request.user
     if request.method == "POST":
-        data = json.loads(request.body)
+        try:
+            data = json.loads(request.body)
+        except:
+            return JsonResponse({"error": "Empty POST request"}, status=400)
         if not data: return JsonResponse({"error": "Empty POST request"}, status=400)
         title = data.get('title')
         amount = Decimal(data.get("amount"))
-        if not title or not amount:return JsonResponse({"error": "Request info incomplete or missing"}, status=400)
-
-        Account.objects.create(user=user, balance=amount, name=title)
+        if not title or amount==None:return JsonResponse({"error": "Request info incomplete or missing"}, status=400)
+        # Fix add empty balance
+        new_acc = Account.objects.create(user=user,balance=0, name=title)
+        category = Category.objects.get(name="Default")
+        Income.objects.create(account=new_acc,amount=amount,category=category)
         return JsonResponse({
                     "msg": "Account (wallet) added successfully"
             }, status=201)
+    elif request.method == "GET":
+        return JsonResponse({"error": "TODO."}, status=400)
     else:
         return JsonResponse({"error": "POST or GET request required."}, status=400)
 

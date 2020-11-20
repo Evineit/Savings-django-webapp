@@ -10,7 +10,7 @@ from django.utils.timezone import make_aware
 class User(AbstractUser):
     def del_accounts(self):
         for account in self.accounts.all():
-            account.remove()
+            account.delete()
 
 class Category(models.Model):
     name = models.CharField(max_length=50)
@@ -21,7 +21,8 @@ class Account(models.Model):
     user = models.ForeignKey("User", on_delete=models.CASCADE, related_name="accounts")
     balance = models.DecimalField(decimal_places=3,max_digits=10)
     name = models.CharField(max_length= 50, blank=True)
-
+    def __str__(self):
+        return f"{self.name}:{self.balance}"
     def update_balance(self):
         for rec_expense in self.rec_expenses.all():
             rec_expense.update_children()
