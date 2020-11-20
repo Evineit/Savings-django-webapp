@@ -8,9 +8,8 @@ urlpatterns = [
     path("register", views.register, name="register"),
 
     path("accounts",views.account, name="account"),
-    # TODO Fix adding spaced accounts
-    # - Accounts with number name fail to get all rec payments 
     path("accounts/<str:account>",views.accounts, name="account"),
+    # Fix accounts with number name fail to get all rec payments 
     path("recpayments/<int:id>",views.rec_payment, name="rec_payment"),
     path("recpayments/<str:account_name>",views.all_rec_payments, name="all_rec_payments"),
 ]

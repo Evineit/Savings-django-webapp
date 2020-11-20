@@ -7,12 +7,17 @@
 <div>
     {% if user.is_authenticated %}
     <div id="content">
-        <h2>{{ account.name }}</h2>
-        <span>Balance: <h4 id="balance">{{ account.balance }}$</h4></span>
+        <span>Balance: <h2 id="balance">{{ account.balance }}$</h2></span>
         <button name="income" data-account-id="{{account.id}}" class="btn btn-outline-success">Add Income</button>
         <button name="expense" data-account-id="{{account.id}}" class="btn btn-outline-danger">Add Expense</button>
-        <button name="recexpense" data-account-id="{{account.id}}" class="btn btn-outline-danger">Add
-            Subscription</button>
+        <button name="recexpense" data-account-id="{{account.id}}" class="btn btn-outline-danger">Add Subscription</button>
+        <div class="acc-container">
+            <br>
+            <span>Current wallet:</span>
+            <span id="accountName" data-account-name="{{account.name}}">{{ account.name }}</span>
+            <span id="acc-change">Change wallet</span>
+            <span id="acc-new">New wallet</span>
+        </div>
     </div>
     <div class="form-popup" id="incomesForm">
         <form class="form-container rounded">
@@ -70,7 +75,35 @@
                 <button type="button" class="btn cancel" onclick="closeForm()">Close</button>
         </form>
     </div>
-    <br>
+    <div class="form-popup" id="changeAccForm">
+        <form class="form-container rounded">
+            <h1>Change account</h1>
+            <div class="input-group mb-3">
+                <div class="input-group-prepend">
+                    <label class="input-group-text" for="inputGroupSelect01">Account</label>
+                </div>
+                <select class="custom-select" name="cycle" id="change_account">
+                    {% for acc in user.accounts.all %}
+                    <option value="{{acc.name}}">{{acc.name}}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <button type="submit" class="btn">Done</button>
+            <button type="button" class="btn cancel" onclick="closeForm()">Close</button>
+        </form>
+    </div>
+    <div class="form-popup" id="newAccForm">
+        <form class="form-container rounded">
+            <h1>Add new wallet</h1>
+            <label for="title"><b>Wallet name</b></label>
+            <input type="text" placeholder="Enter title" name="title" required>
+            <label for="amount"><b>Starting amount</b></label>
+            <input type="number" min=0 placeholder="Enter Amount $" name="amount" required>
+            <button type="submit" class="btn">Done</button>
+            <button type="button" class="btn cancel" onclick="closeForm()">Close</button>
+        </form>
+    </div>
+    <!-- <br> -->
     <h3>Active Subscriptions</h3>
     <div class="subs-container rounded">
 

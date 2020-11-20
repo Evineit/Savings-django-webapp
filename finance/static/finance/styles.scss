@@ -12,6 +12,25 @@ body {
 
 div#content {
   text-align: center;
+  div.acc-container{
+    display: inline;
+    span {
+      margin: 0px 5px;
+      // cursor: pointer;
+    }
+    #accountName{
+      color: #cfd2d6;
+    }
+    #acc-change, #acc-new{
+      cursor: pointer;
+    }
+    #acc-change:hover{
+      color: yellow;
+    }
+    #acc-new:hover{
+      color: #28a745;
+    }
+  }
 }
 
 div.subs-container {

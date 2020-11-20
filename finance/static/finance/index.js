@@ -1,8 +1,58 @@
 document.addEventListener('DOMContentLoaded', function() {
-    const account_name = document.querySelector('#content>h2').innerHTML;
-    reload_subs(account_name)
+    reload_subs("Default")
     set_buttons()
+    set_listeners()
     
+});
+
+function set_listeners(){
+    let account_name = document.querySelector('#accountName').dataset.accountName;
+    document.querySelector('#changeAccForm>form').onsubmit = function() {
+        const new_account = document.getElementById("change_account").value
+        if (new_account == account_name){
+            closeForm()
+            return false
+        } 
+        const current_name = document.querySelector('#accountName')
+        current_name.innerHTML = new_account
+        current_name.dataset.accountName = new_account
+        set_listeners()
+        reload_balance(new_account)
+        reload_subs(new_account)
+        closeForm()
+        return false
+    }
+
+    document.querySelector('#newAccForm>form').onsubmit = function() {
+        const title = document.querySelector('#newAccForm>form>input[name="title"]').value;
+        const amount = document.querySelector('#newAccForm>form>input[name="amount"]').value;
+        let csrftoken = getCookie('csrftoken');
+        fetch('/accounts', {
+            method: 'POST',
+            body: JSON.stringify({
+                title: title,
+                amount: amount,
+            }),
+            headers: {
+                "X-CSRFToken": csrftoken
+            }
+        })
+        .then(response =>{
+            if (response.ok){
+                new_account = document.createElement('option') 
+                new_account.value = title
+                new_account.innerHTML = title
+                document.getElementById("change_account").append(new_account) 
+            }
+            document.querySelector('#newAccForm>form>input[name="title"]').value = null;
+            document.querySelector('#newAccForm>form>input[name="amount"]').value = null;
+        })
+        closeForm()
+        return false
+        
+    }
+
+
     document.querySelector('#incomesForm>form').onsubmit = function() {
         const amount = document.querySelector('#incomesForm>form>input').value;
         document.querySelector('#incomesForm>form>input').value = null;
@@ -90,6 +140,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     response.json().then(result =>{
                         new_sub = create_sub(result.sub)
                         document.querySelector(".subs-container").prepend(new_sub)
+                        reload_balance(account_name)
                     })
                 }
             })
@@ -100,7 +151,7 @@ document.addEventListener('DOMContentLoaded', function() {
         closeForm()
         return false
     }
-});
+}
 
 function set_buttons() {
     document.querySelector('button[name="income"]').onclick = () => {
@@ -116,6 +167,15 @@ function set_buttons() {
         closeForm()
         openForm("recexpenses")
     }
+    document.querySelector('#acc-change').onclick = () => {
+        closeForm()
+        openForm("changeAcc")
+    }
+    document.querySelector('#acc-new').onclick = () => {
+        closeForm()
+        openForm("newAcc")
+    }
+
 }
 
 // The following function is from 

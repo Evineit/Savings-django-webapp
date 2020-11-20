@@ -89,7 +89,6 @@ def account(request):
         title = data.get('title')
         amount = Decimal(data.get("amount"))
         if not title or amount==None:return JsonResponse({"error": "Request info incomplete or missing"}, status=400)
-        # Fix add empty balance
         new_acc = Account.objects.create(user=user,balance=0, name=title)
         category = Category.objects.get(name="Default")
         Income.objects.create(account=new_acc,amount=amount,category=category)
