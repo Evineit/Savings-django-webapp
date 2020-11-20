@@ -219,7 +219,7 @@ function reload_balance(account_name) {
 function reload_subs(account_name) {
     const subs_div = document.querySelector(".subs-container")
     subs_div.innerHTML = ''
-    fetch('/recpayments/' + account_name)
+    fetch('/accounts/'+account_name+'/recpayments')
         .then(response => response.json())
         .then(payments => {
             payments.forEach(payment => {

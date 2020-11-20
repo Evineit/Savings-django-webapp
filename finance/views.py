@@ -185,14 +185,14 @@ def accounts(request, account):
     else:
         return JsonResponse({"error": "POST or GET request required."}, status=400)
         
-def all_rec_payments(request, account_name):
+def all_rec_payments(request, account):
     user = request.user
     if request.method == "GET":
         try:
-            account = user.accounts.get(name=account_name)
+            account = user.accounts.get(name=account)
             payments = account.rec_expenses.order_by("-id").exclude(end_date__lte=timezone.now()).all()
         except:
-            return JsonResponse({"error": f"Account: {account_name}. Doesn't exist"}, status=400)
+            return JsonResponse({"error": f"Account: {account}. Doesn't exist"}, status=400)
         return JsonResponse([payment.serialize() for payment in payments], safe=False, status=200)    
     else:
         return JsonResponse({"error": "GET request required."}, status=400)

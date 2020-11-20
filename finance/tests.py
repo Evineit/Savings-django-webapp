@@ -29,7 +29,7 @@ class PostTestCase(TestCase):
         logged_in = c.login(username = 'u1',password="pass1234")
         self.assertTrue(logged_in)
         account_name = "123"
-        response = c.get('/recpayments/'+account_name)
+        response = c.get('/accounts/'+account_name+'/recpayments')
         self.assertEqual(response.status_code,200)
         self.assertEqual(len(response.json()), 0)
 
@@ -158,7 +158,7 @@ class PostTestCase(TestCase):
             'schedule_type': 'Custom'
         }, content_type='application/json')
         response_2 = c.get('/accounts/default')
-        response_3 = c.get('/recpayments/default')
+        response_3 = c.get('/accounts/default/recpayments')
         self.assertEqual(response.status_code, 201)
         self.assertLess(Decimal(response_2.json().get('balance')),0)
         self.assertEqual(response_3.status_code, 200)
@@ -184,7 +184,7 @@ class PostTestCase(TestCase):
             end_date = make_aware(datetime.datetime(2020,10,1)),
             schedule_type = "Monthly"
         )
-        response_payments = c.get('/recpayments/default')
+        response_payments = c.get('/accounts/default/recpayments')
         # Assert only 1 RecurringPayment is active
         self.assertEqual(response_payments.status_code, 200)
         self.assertEqual(len(response_payments.json()), 1)
@@ -225,7 +225,7 @@ class PostTestCase(TestCase):
             'start_date': '2020-11-01',
             'schedule_type': 'Custom'
         }, content_type='application/json')
-        response = c.get('/recpayments/default')
+        response = c.get('/accounts/default/recpayments')
         self.assertEqual(response.status_code, 200)
         self.assertEqual(len(response.json()), 1)
 
@@ -237,7 +237,7 @@ class PostTestCase(TestCase):
             'remove_last_movement': False
         }, content_type='application/json')
         self.assertEqual(stop_response.status_code, 200)
-        response = c.get('/recpayments/default')
+        response = c.get('/accounts/default/recpayments')
         self.assertEqual(len(response.json()), 0)
 
     def test_server_recurring_payment_next_payment_date(self):
@@ -283,7 +283,7 @@ class PostTestCase(TestCase):
             'start_date': '2020-11-01',
             'schedule_type': 'Custom'
         }, content_type='application/json')
-        response = c.get('/recpayments/default')
+        response = c.get('/accounts/default/recpayments')
         self.assertEqual(response.status_code, 200)
         pay_id = response.json()[0].get("id")
         change_amount_response = c.put('/recpayments/' + str(pay_id), data={
