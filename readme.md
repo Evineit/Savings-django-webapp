@@ -23,18 +23,28 @@ GET /accounts/<str:account>
 - Get Account info (Balance)
 <!-- - Responds a Json with account info like balance -->
 
-<!-- DELETE /accounts/<str:account>
-- Delete Account | Confirmation needed | checkbox -->
+<!--
+DELETE /accounts/<str:account>
+- Manage the default index account if default is deleted
+- Delete Account | Confirmation needed | checkbox 
+
+Put /accounts/<str:account>/name
+- Manage the default index account if default name is changed
+- Change account name
+-->
 
 POST /accounts/<str:account>
-- Add new expense, income, recurring payment, recurring income.
+- Add new expense, income, recurring payment
 - Receives JSON with {type, amount, extra info}
 
 GET /accounts/<str:account>/recpayments
 - Get all the recurrent expenses of given account
 
-<!-- GET /accounts/<str:account>/recincomes
-- Get all the recurrent incomes of given account -->
+GET /accounts/<str:account>/recincomes
+- Get all the recurrent incomes of given account
+
+POST /accounts/<str:account>/recincomes
+- Add new recurring income.
 
 ------------------------------------------------------------------- 
 
@@ -49,25 +59,28 @@ DELETE /incomes/<int:id>
 
 DELETE /expenses/<int:id>
 - Delete the selected item info
-
---------------------------------------------------------------------- -->
+-->
+---------------------------------------------------------------------
 
 GET /recpayments/<int:id>
 - Get the selected item info
 
 PUT /recpayments/<int:id>
-- Updates the selected item info
+- takes an "action" parameter to stop or change the current  payment amount 
 
 <!-- DELETE /recpayments/<int:id>
 - Deletes the selected item info -->
 
-<!-- GET /recincomes/<int:id>
-- Get the selected item info -->
+GET /recincomes/<int:id>
+- Get the selected item info
 
-<!-- PUT /recincomes/<int:id>
-- Updates the selected item info
+PUT /recincomes/<int:id>/stop
+- Stops the selected recurrent payment
 
+PUT /recincomes/<int:id>/edit
+- Changes the current amount affecting future payments
 
+<!-- 
 DELETE /recincomes/<int:id>
 - Deletes the selected item info -->
 
@@ -87,7 +100,7 @@ It fulfills the following requirements:
     - Recurring payments should have at least 2 types of scheduling (monthly, yearly)
     - View active subscriptions, including the next payment date, a description/title and the type of schedule
 
-* Wallets (accounts): Users can add new accounts
+* Wallets (accounts): Users can create new wallets
     - Accounts should have independent balance and payments
     - User should be able to change between accounts without reloading
     <!-- TODO: Users should only be able to interact with their own things-->

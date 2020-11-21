@@ -117,7 +117,7 @@ function set_listeners(){
         const amount = document.querySelector('#recexpensesForm>form>input[name="amount"]').value;
         const start_date = document.getElementById("start").value
         const schedule_type = document.getElementById("schedule_type").value
-        reset_recexpense()
+        reset_recurrent_form("recexpensesForm")
         // Send a POST request to the URL
         let csrftoken = getCookie('csrftoken');
         fetch('/accounts/'+account_name, {
@@ -125,7 +125,6 @@ function set_listeners(){
                 body: JSON.stringify({
                     type: "rec_expense",
                     amount: amount,
-                    // Change or remove
                     description: title,
                     start_date: start_date,
                     schedule_type: schedule_type,
@@ -139,7 +138,44 @@ function set_listeners(){
                 if (response.ok){
                     response.json().then(result =>{
                         new_sub = create_sub(result.sub)
-                        document.querySelector(".subs-container").prepend(new_sub)
+                        document.getElementById("rec_expenses_container").prepend(new_sub)
+                        reload_balance(account_name)
+                    })
+                }
+            })
+            // Catch any errors and log them to the console
+            .catch(error => {
+                console.log('Error:', error);
+            });        
+        closeForm()
+        return false
+    }
+    document.querySelector('#recIncomesForm>form').onsubmit = () => {
+        const title = document.querySelector('#recIncomesForm>form>input[name="title"]').value;
+        const amount = document.querySelector('#recIncomesForm>form>input[name="amount"]').value;
+        const start_date = document.getElementById("income_start").value
+        const schedule_type = document.getElementById("income_schedule_type").value
+        reset_recurrent_form("recIncomesForm")
+        // Send a POST request to the URL
+        let csrftoken = getCookie('csrftoken');
+        fetch(`/accounts/${account_name}/recincomes`, {
+                method: 'POST',
+                body: JSON.stringify({
+                    amount: amount,
+                    description: title,
+                    start_date: start_date,
+                    schedule_type: schedule_type,
+                }),
+                headers: {
+                    "X-CSRFToken": csrftoken
+                },
+                credentials: "include"
+            })
+            .then(response => {
+                if (response.ok){
+                    response.json().then(result =>{
+                        new_sub = create_rec_income(result.sub)
+                        document.getElementById("rec_incomes_container").prepend(new_sub)
                         reload_balance(account_name)
                     })
                 }
@@ -163,9 +199,14 @@ function set_buttons() {
         openForm("expenses")
     }
     document.querySelector('button[name="recexpense"]').onclick = () => {
-        reset_recexpense()
+        reset_recurrent_form("recexpensesForm")
         closeForm()
         openForm("recexpenses")
+    }
+    document.querySelector('button[name="recincome"]').onclick = () => {
+        reset_recurrent_form("recIncomesForm")
+        closeForm()
+        openForm("recIncomes")
     }
     document.querySelector('#acc-change').onclick = () => {
         closeForm()
@@ -217,16 +258,26 @@ function reload_balance(account_name) {
 }
 
 function reload_subs(account_name) {
-    const subs_div = document.querySelector(".subs-container")
+    const subs_div = document.getElementById("rec_expenses_container")
+    const rec_incomes_div = document.getElementById("rec_incomes_container")
     subs_div.innerHTML = ''
+    rec_incomes_div.innerHTML = ''
     fetch('/accounts/'+account_name+'/recpayments')
         .then(response => response.json())
         .then(payments => {
             payments.forEach(payment => {
                 new_sub = create_sub(payment)
-                document.querySelector(".subs-container").append(new_sub)
+                document.getElementById("rec_expenses_container").append(new_sub)
             });
         });
+    fetch('/accounts/'+account_name+'/recincomes')
+    .then(response => response.json())
+    .then(payments => {
+        payments.forEach(payment => {
+            new_sub = create_rec_income(payment)
+            document.getElementById("rec_incomes_container").append(new_sub)
+        });
+    });
 }
 
 function create_sub(payment){
@@ -251,6 +302,56 @@ function create_sub(payment){
     amount_button.className = "btn btn-outline-primary btn-hidden"
     amount_button.addEventListener('click', () =>{
         change_amount(payment.id, amount)
+    })
+
+    title.innerHTML = `id: ${payment.id}, ${payment.description}, Schedule:${payment.schedule_type}
+    , Next payment date: ${payment.next_date}`;
+    amount.innerHTML = `Amount:${payment.amount}$`
+    top_div.append(title)
+    top_div.append(amount)
+    bot_div.append(amount_button)  
+    bot_div.append(stop_button)  
+    element.append(top_div)
+    element.append(bot_div)
+
+    return element  
+}
+
+function create_rec_income(payment){
+    const element = document.createElement('div')
+    const top_div = document.createElement('div')
+    const bot_div = document.createElement('div')
+    const title = document.createElement('h6')
+    const amount = document.createElement('h6')
+    const stop_button = document.createElement('button')
+    const amount_button = document.createElement('button')
+    element.className = "subs"
+    top_div.className = "subs-top-container"
+    element.dataset.id = payment.id
+    title.style = "flex: 1;"
+    stop_button.innerText = "Stop"
+    stop_button.className = "btn btn-outline-danger btn-hidden"
+    stop_button.addEventListener('click', () =>{
+        hide_payment(element)
+        let csrftoken = getCookie('csrftoken');
+        fetch(`/recincomes/${payment.id}/stop`,{
+            method: 'PUT',
+            body: JSON.stringify({
+                // TODO: remove maybe
+                remove_last_movement: false,
+            }),
+            headers:{
+                "X-CSRFToken": csrftoken
+            }
+        })
+        .catch( error => {
+            console.log('Error:', error);
+        })
+    })
+    amount_button.innerText = "Change amount"
+    amount_button.className = "btn btn-outline-primary btn-hidden"
+    amount_button.addEventListener('click', () =>{
+        change_recincomes_amount(payment.id, amount)
     })
 
     title.innerHTML = `id: ${payment.id}, ${payment.description}, Schedule:${payment.schedule_type}
@@ -297,6 +398,36 @@ function change_amount(payment_id, amount_elem){
     }
 }
 
+function change_recincomes_amount(payment_id, amount_elem){
+    document.getElementById("amount_form").style.display = "block";
+    document.querySelector('#amount_form>form').onsubmit = function() {
+        const amount = document.querySelector('#amount_form>form>input').value;
+        document.querySelector('#amount_form>form>input').value = null;
+        let csrftoken = getCookie('csrftoken');
+        fetch(`/recincomes/${payment_id}/edit`,{
+            method: 'PUT',
+            body: JSON.stringify({
+                amount: amount,
+            }),
+            headers:{
+                "X-CSRFToken": csrftoken
+            }
+        })
+        .then( response =>{
+            closeForm()
+            if (response.ok){
+                response.json().then(result =>{
+                    amount_elem.innerHTML = `Amount:${result.amount}$`
+                })
+            }
+        })
+        .catch( error => {
+            console.log('Error:', error);
+        })
+        return false
+    }
+}
+
 function stop_payment(payment_id){
     let csrftoken = getCookie('csrftoken');
     fetch('/recpayments/'+payment_id,{
@@ -321,10 +452,13 @@ function hide_payment(element){
     }, 3000);
 }
 
-function reset_recexpense(){
-    document.querySelector('#recexpensesForm>form>input').value = null;
+function reset_recurrent_form(form){
+    document.querySelector(`#${form}>form>input`).value = null;
+    document.querySelector(`#${form}>form>input[name="amount"]`).value = null
     document.getElementById("start").setAttribute("min", today());
     document.getElementById("start").setAttribute("value", today());
+    document.getElementById("income_start").setAttribute("min", today());
+    document.getElementById("income_start").setAttribute("value", today());
 }
 
 function today() {

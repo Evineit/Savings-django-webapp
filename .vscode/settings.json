@@ -3,6 +3,7 @@
         "csrftoken",
         "recexpense",
         "recexpenses",
+        "recincomes",
         "recpayments"
     ]
 }
