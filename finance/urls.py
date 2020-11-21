@@ -12,4 +12,6 @@ urlpatterns = [
     path("accounts/<str:account>/recpayments",views.all_rec_payments, name="all_rec_payments"),
     path("accounts/<str:account>/recincomes",views.all_rec_incomes, name="all_rec_incomes"),
     path("recpayments/<int:id>",views.rec_payment, name="rec_payment"),
+    path("recincomes/<int:id>",views.rec_income, name="rec_income"),
+    path("recincomes/<int:id>/stop",views.rec_income_stop, name="rec_income_stop"),
 ]
