@@ -19,7 +19,7 @@ def next_payment_date(recurringObject, date= timezone.now()) -> datetime.datetim
 
 def update_children(recurringObject,childClass,date = timezone.now()):
         cycles = recurringObject.cycles_at_date(date) 
-        children_count = recurringObject.expenses.all().count()
+        children_count = recurringObject.children.all().count()
         new_date = recurringObject.start_date
         
         while (children_count <= cycles ):
@@ -36,7 +36,7 @@ def update_children(recurringObject,childClass,date = timezone.now()):
                     category = recurringObject.category,
                     recurring_parent = recurringObject
             ) 
-            children_count = recurringObject.expenses.all().count()
+            children_count = recurringObject.children.all().count()
 
 def cycles_at_date(recurringObject, date:datetime = timezone.now()) -> int:
         if timezone.is_naive(date): date = make_aware(date)

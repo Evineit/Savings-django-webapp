@@ -35,7 +35,7 @@ class Income(models.Model):
     amount = models.DecimalField(decimal_places=3,max_digits=10)
     added_date = models.DateTimeField(default=timezone.now)
     category = models.ForeignKey(Category, on_delete=models.CASCADE, related_name="incomes")
-    recurring_parent = models.ForeignKey("RecurringIncome", on_delete=models.CASCADE, related_name="incomes", null=True, blank=True)
+    recurring_parent = models.ForeignKey("RecurringIncome", on_delete=models.CASCADE, related_name="children", null=True, blank=True)
     def __str__(self):
         return f"id: {self.id},account:{self.account.name},amount: {self.amount}, date:{self.added_date}"
 
@@ -45,7 +45,7 @@ class Expense(models.Model):
     amount = models.DecimalField(decimal_places=3,max_digits=10)
     added_date = models.DateTimeField(default=timezone.now)
     category = models.ForeignKey(Category, on_delete=models.CASCADE,related_name="expenses")
-    recurring_parent = models.ForeignKey("RecurringPayment", on_delete=models.CASCADE, related_name="expenses", null=True, blank=True)
+    recurring_parent = models.ForeignKey("RecurringPayment", on_delete=models.CASCADE, related_name="children", null=True, blank=True)
     def __str__(self):
         return f"id: {self.id},amount: {self.amount}, date:{self.added_date}"
 

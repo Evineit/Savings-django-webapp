@@ -95,7 +95,7 @@ class PostTestCase(TestCase):
             start_date = make_aware(datetime.datetime(2020,11,1)),
             schedule_type = "Custom"
         )
-        self.assertEqual(test.expenses.all().count(), 0)
+        self.assertEqual(test.children.all().count(), 0)
         self.assertEqual(Expense.objects.filter(recurring_parent=test).count(), 0)
         Expense.objects.create(
                 account= test.account,
@@ -104,7 +104,7 @@ class PostTestCase(TestCase):
                 category = test.category,
                 recurring_parent = test
         )
-        self.assertEqual(test.expenses.all().count(), 1)
+        self.assertEqual(test.children.all().count(), 1)
         self.assertEqual(Expense.objects.filter(recurring_parent=test).count(), 1)
     
     def test_rec_payment_cycles_daily(self):
@@ -117,13 +117,13 @@ class PostTestCase(TestCase):
             start_date = date,
             schedule_type = "Custom"
         )
-        self.assertEqual(test.expenses.all().count(), 0)
+        self.assertEqual(test.children.all().count(), 0)
         test.update_children()
         # Checks if the first payment in the first child is the same as the start date
-        self.assertEqual(test.start_date,test.expenses.order_by("added_date").first().added_date)
+        self.assertEqual(test.start_date,test.children.order_by("added_date").first().added_date)
         # Given that the schedule is daily, checks the number of children is the same as the 
         # difference in days + 1 (the first payment)
-        self.assertEqual(test.expenses.all().count(),(timezone.now() - date).days + 1)
+        self.assertEqual(test.children.all().count(),(timezone.now() - date).days + 1)
         
     
     def test_rec_payment_children_monthly(self):
@@ -135,16 +135,16 @@ class PostTestCase(TestCase):
             start_date = make_aware(datetime.datetime(2020,11,1)),
             schedule_type = "Monthly"
         )
-        self.assertEqual(rec_payment.expenses.all().count(), 0)
+        self.assertEqual(rec_payment.children.all().count(), 0)
         rec_payment.update_children(datetime.datetime(2020,11,30))
-        self.assertEqual(rec_payment.expenses.all().count(),1)
+        self.assertEqual(rec_payment.children.all().count(),1)
         rec_payment.update_children(datetime.datetime(2020,12,1))
-        self.assertEqual(rec_payment.expenses.all().count(),2)
+        self.assertEqual(rec_payment.children.all().count(),2)
         rec_payment.update_children(datetime.datetime(2021,11,1))
-        self.assertEqual(rec_payment.expenses.all().count(),13)
+        self.assertEqual(rec_payment.children.all().count(),13)
         
         test_date = rec_payment.start_date
-        for exp in rec_payment.expenses.all():
+        for exp in rec_payment.children.all():
             self.assertEqual(exp.added_date.date(), test_date.date())
             test_date = add_months(test_date, 1)
     
@@ -157,16 +157,16 @@ class PostTestCase(TestCase):
             start_date = make_aware(datetime.datetime(2020,11,1)),
             schedule_type = "Monthly"
         )
-        self.assertEqual(rec_payment.incomes.all().count(), 0)
+        self.assertEqual(rec_payment.children.all().count(), 0)
         rec_payment.update_children(datetime.datetime(2020,11,30))
-        self.assertEqual(rec_payment.incomes.all().count(),1)
+        self.assertEqual(rec_payment.children.all().count(),1)
         rec_payment.update_children(datetime.datetime(2020,12,1))
-        self.assertEqual(rec_payment.incomes.all().count(),2)
+        self.assertEqual(rec_payment.children.all().count(),2)
         rec_payment.update_children(datetime.datetime(2021,11,1))
-        self.assertEqual(rec_payment.incomes.all().count(),13)
+        self.assertEqual(rec_payment.children.all().count(),13)
         
         test_date = rec_payment.start_date
-        for exp in rec_payment.incomes.all():
+        for exp in rec_payment.children.all():
             self.assertEqual(exp.added_date.date(), test_date.date())
             test_date = add_months(test_date, 1)
 
@@ -222,8 +222,8 @@ class PostTestCase(TestCase):
         self.assertEqual(len(response_payments.json()), 1)
         # Updates the children at the time
         c.get('/accounts/default')
-        self.assertGreaterEqual(rec_payment_active.expenses.count(),3)
-        self.assertEqual(rec_payment_inactive.expenses.count(),2)
+        self.assertGreaterEqual(rec_payment_active.children.count(),3)
+        self.assertEqual(rec_payment_inactive.children.count(),2)
         rec_payment_active = RecurringPayment.objects.create(
             account = Account.objects.get(),
             description = "test",
@@ -328,8 +328,8 @@ class PostTestCase(TestCase):
         self.assertEqual(Decimal(rec_pay_response.json().get('amount')),Decimal(100)) 
         rec_payment_1 = RecurringPayment.objects.get(pk=pay_id)
         rec_payment_1.update_children(timezone.now()+timezone.timedelta(days=1))
-        child_last = rec_payment_1.expenses.order_by("-id")[0]
-        other_child = rec_payment_1.expenses.order_by("-id")[1]
+        child_last = rec_payment_1.children.order_by("-id")[0]
+        other_child = rec_payment_1.children.order_by("-id")[1]
         self.assertEqual(Decimal(child_last.amount),Decimal(100))
         self.assertEqual(Decimal(other_child.amount),Decimal(15))
 
