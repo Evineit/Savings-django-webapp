@@ -290,6 +290,8 @@ def rec_income_stop(request,id):
         payment.end_date = timezone.now()
         payment.save()
         return JsonResponse({"msg": f"Payment with id: {id}. Has been stopped"}, status=200)
+    else:
+        return JsonResponse({"error": "PUT request required."}, status=400)
 
 def rec_income_edit(request,id):
     try:

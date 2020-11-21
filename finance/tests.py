@@ -401,7 +401,7 @@ class PostTestCase(TestCase):
         rec_pay_response = c.get(f'/recincomes/{pay_id}') 
         self.assertEqual(rec_pay_response.status_code,200) 
         self.assertEqual(Decimal(rec_pay_response.json().get('amount')),Decimal(100)) 
-        rec_payment_1 = RecurringPayment.objects.get(pk=pay_id)
+        rec_payment_1 = RecurringIncome.objects.get(pk=pay_id)
         rec_payment_1.update_children(timezone.now()+timezone.timedelta(days=1))
         child_last = rec_payment_1.children.order_by("-id")[0]
         other_child = rec_payment_1.children.order_by("-id")[1]
