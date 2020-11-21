@@ -384,13 +384,14 @@ class PostTestCase(TestCase):
         c = Client()
         logged_in = c.login(username = 'u1',password="pass1234")
         self.assertTrue(logged_in)
-        c.post('/accounts/default/recincomes',data={
+        add_response = c.post('/accounts/default/recincomes',data={
             'amount': '15',
             'description': 'test',
             'start_date': '2020-11-01',
             'schedule_type': 'Custom'
         }, content_type='application/json')
         response = c.get('/accounts/default/recincomes')
+        self.assertEqual(add_response.status_code, 201)
         self.assertEqual(response.status_code, 200)
         pay_id = response.json()[0].get("id")
         change_amount_response = c.put(f'/recincomes/{pay_id}/edit', data={

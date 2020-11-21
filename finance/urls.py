@@ -10,5 +10,6 @@ urlpatterns = [
     path("accounts",views.account, name="account"),
     path("accounts/<str:account>",views.accounts, name="accounts"),
     path("accounts/<str:account>/recpayments",views.all_rec_payments, name="all_rec_payments"),
+    path("accounts/<str:account>/recincomes",views.all_rec_incomes, name="all_rec_incomes"),
     path("recpayments/<int:id>",views.rec_payment, name="rec_payment"),
 ]
