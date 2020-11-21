@@ -90,7 +90,7 @@ It fulfills the following requirements:
 * Wallets (accounts): Users can add new accounts
     - Accounts should have independent balance and payments
     - User should be able to change between accounts without reloading
-    <!-- TODO: Users should only be able to interact with their on things-->
+    <!-- TODO: Users should only be able to interact with their own things-->
 
 * Update recurring payments: Users should be able edit any of their own payments.
     - Users should be able to stop a subscription without deleting the previous payments.

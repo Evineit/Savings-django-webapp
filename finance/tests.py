@@ -46,10 +46,6 @@ class PostTestCase(TestCase):
         self.assertEqual(response.status_code,200)
         self.assertEqual(Decimal(response.json().get("balance")),Decimal(15))
 
-
-
-        
-        
     def test_cat_count(self):
         u = User.objects.get(username="u1")
         self.assertEqual(Category.objects.all().count(), 1)
@@ -64,7 +60,6 @@ class PostTestCase(TestCase):
             category = Category.objects.get(),
             amount = 10,
             start_date = make_aware(datetime.datetime(2020,11,1)),
-            # end_date = datetime.date(2021,11,1),
             schedule_type = "Monthly"
         )
         cycles = rec_payment.cycles_at_date(make_aware(datetime.datetime(2020,11,11)))
@@ -74,6 +69,21 @@ class PostTestCase(TestCase):
         cycles = rec_payment.cycles_at_date(make_aware(datetime.datetime(2021,11,1)))
         self.assertEqual(cycles,12)
 
+    def test_rec_incomes_cycles_monthly(self):
+        rec_payment = RecurringIncome.objects.create(
+            account = Account.objects.get(),
+            description = "test",
+            category = Category.objects.get(),
+            amount = 10,
+            start_date = make_aware(datetime.datetime(2020,11,1)),
+            schedule_type = "Monthly"
+        )
+        cycles = rec_payment.cycles_at_date(make_aware(datetime.datetime(2020,11,11)))
+        self.assertEqual(cycles,0)
+        cycles = rec_payment.cycles_at_date(make_aware(datetime.datetime(2020,12,1)))
+        self.assertEqual(cycles,1)
+        cycles = rec_payment.cycles_at_date(make_aware(datetime.datetime(2021,11,1)))
+        self.assertEqual(cycles,12)
 
 
     def test_rec_payment_create_child(self):
@@ -138,6 +148,28 @@ class PostTestCase(TestCase):
             self.assertEqual(exp.added_date.date(), test_date.date())
             test_date = add_months(test_date, 1)
     
+    def test_rec_income_children_monthly(self):
+        rec_payment = RecurringIncome.objects.create(
+            account = Account.objects.get(),
+            description = "test",
+            category = Category.objects.get(),
+            amount = 10,
+            start_date = make_aware(datetime.datetime(2020,11,1)),
+            schedule_type = "Monthly"
+        )
+        self.assertEqual(rec_payment.incomes.all().count(), 0)
+        rec_payment.update_children(datetime.datetime(2020,11,30))
+        self.assertEqual(rec_payment.incomes.all().count(),1)
+        rec_payment.update_children(datetime.datetime(2020,12,1))
+        self.assertEqual(rec_payment.incomes.all().count(),2)
+        rec_payment.update_children(datetime.datetime(2021,11,1))
+        self.assertEqual(rec_payment.incomes.all().count(),13)
+        
+        test_date = rec_payment.start_date
+        for exp in rec_payment.incomes.all():
+            self.assertEqual(exp.added_date.date(), test_date.date())
+            test_date = add_months(test_date, 1)
+
     def test_server_fail_recurring_payments(self):
         c = Client()
         logged_in = c.login(username = 'u1',password="pass1234")
