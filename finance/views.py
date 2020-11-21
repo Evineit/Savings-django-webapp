@@ -205,9 +205,37 @@ def all_rec_incomes(request, account):
             payments = account.rec_incomes.order_by("-id").exclude(end_date__lte=timezone.now()).all()
         except:
             return JsonResponse({"error": f"Account: {account}. Doesn't exist"}, status=400)
-        return JsonResponse([payment.serialize() for payment in payments], safe=False, status=200)    
+        return JsonResponse([payment.serialize() for payment in payments], safe=False, status=200)   
+    elif request.method == "POST":
+        data = json.loads(request.body)
+        if not data: return JsonResponse({"error": "Empty POST request"}, status=400)
+        user_account = user.accounts.get(name=account)
+        amount = Decimal(data.get("amount"))
+        category_name = data.get("category","Default")
+        description = data.get("description","No description")
+        str_date = data.get("start_date")
+        start_date = datetime.strptime(str_date, r'%Y-%m-%d')
+        schedule_type = data.get("schedule_type")
+        try:
+            category = Category.objects.get(name=category_name)
+        except:
+            return JsonResponse({"error": f"Category: {category_name}. Doesn't exist"}, status=400)
+        new_income = RecurringIncome.objects.create(
+            account=user_account,
+            description=description,
+            amount=amount,
+            start_date=make_aware(start_date),
+            schedule_type=schedule_type,
+            category=category,
+        )
+        new_income.update_children()
+        user_account.update_balance()
+        return JsonResponse({
+                "sub": new_income.serialize(),
+                "msg": "New recurrent income added successfully"
+        }, status=201) 
     else:
-        return JsonResponse({"error": "GET request required."}, status=400)
+        return JsonResponse({"error": "GET or POST request required."}, status=400)
 
 def rec_payment(request, id):
     try:
