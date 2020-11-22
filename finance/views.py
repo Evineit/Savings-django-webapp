@@ -10,7 +10,7 @@ from decimal import Decimal
 from django.utils.timezone import activate
 from .models import *
 from datetime import datetime
-
+# TODO: login requiered decorator
 # Create your views here. 
 def index(request):
     if (request.user.is_authenticated):
@@ -91,7 +91,7 @@ def account(request):
         if not title or amount==None:return JsonResponse({"error": "Request info incomplete or missing"}, status=400)
         new_acc = Account.objects.create(user=user,balance=0, name=title)
         category = Category.objects.get(name="Default")
-        Income.objects.create(account=new_acc,amount=amount,category=category)
+        if amount: Income.objects.create(account=new_acc,amount=amount,category=category)
         return JsonResponse({
                     "msg": "Account (wallet) added successfully"
             }, status=201)
@@ -124,9 +124,7 @@ def accounts(request, account):
             user_account.update_balance()
             balance = user_account.balance
             return JsonResponse({
-                    "account": account,
-                    "payment_amount": amount,
-                    "new balance": balance,
+                    "sub": new_income.serialize(),
                     "msg": "Income added successfully"
             }, status=201)
         elif request_type == "expense":
@@ -143,9 +141,7 @@ def accounts(request, account):
             user_account.update_balance()
             balance = user_account.balance
             return JsonResponse({
-                    "account": account,
-                    "payment_amount": amount,
-                    "new balance": balance,
+                    "sub": new_expense.serialize(),
                     "msg": "Expense added successfully"
             }, status=201)
         elif request_type == "rec_expense":
@@ -184,7 +180,31 @@ def accounts(request, account):
         }, status=200)
     else:
         return JsonResponse({"error": "POST or GET request required."}, status=400)
-        
+
+def all_incomes(request, account):
+    user = request.user
+    if request.method == "GET":
+        try:
+            account = user.accounts.get(name=account)
+            payments = account.incomes.order_by("-id").all()
+        except:
+            return JsonResponse({"error": f"Account: {account}. Doesn't exist"}, status=400)
+        return JsonResponse([payment.serialize() for payment in payments], safe=False, status=200)    
+    else:
+        return JsonResponse({"error": "GET request required."}, status=400) 
+
+def all_expenses(request, account):
+    user = request.user
+    if request.method == "GET":
+        try:
+            account = user.accounts.get(name=account)
+            payments = account.expenses.order_by("-id").all()
+        except:
+            return JsonResponse({"error": f"Account: {account}. Doesn't exist"}, status=400)
+        return JsonResponse([payment.serialize() for payment in payments], safe=False, status=200)    
+    else:
+        return JsonResponse({"error": "GET request required."}, status=400) 
+
 def all_rec_payments(request, account):
     user = request.user
     if request.method == "GET":

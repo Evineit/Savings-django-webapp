@@ -3,7 +3,6 @@
 
 
 {% block body %}
-<h1>{{finance}}</h1>
 <div>
     {% if user.is_authenticated %}
     <div id="content">
@@ -141,6 +140,14 @@
     </div>
     <h3>Active Recurrent Incomes</h3>
     <div id="rec_incomes_container" class="subs-container rounded">
+
+    </div>
+    <h3>Incomes</h3>
+    <div id="incomes_container" class="subs-container rounded">
+
+    </div>
+    <h3>Expenses</h3>
+    <div id="expenses_container" class="subs-container rounded">
 
     </div>
     {% endif %}

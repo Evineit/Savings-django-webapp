@@ -38,7 +38,15 @@ class Income(models.Model):
     recurring_parent = models.ForeignKey("RecurringIncome", on_delete=models.CASCADE, related_name="children", null=True, blank=True)
     def __str__(self):
         return f"id: {self.id},account:{self.account.name},amount: {self.amount}, date:{self.added_date}"
-
+    def serialize(self):
+        return {
+            "id": self.id,
+            "amount": self.amount,
+            "category": self.category.name,
+            "added_date": self.added_date.strftime("%b %-d %Y, %-I:%M %p"),
+            "parent_id": self.recurring_parent.id if self.recurring_parent else None,
+            "parent_title": self.recurring_parent.description if self.recurring_parent else None,
+        }
 
 class Expense(models.Model):
     account = models.ForeignKey("Account", on_delete=models.CASCADE, related_name="expenses")
@@ -48,6 +56,15 @@ class Expense(models.Model):
     recurring_parent = models.ForeignKey("RecurringPayment", on_delete=models.CASCADE, related_name="children", null=True, blank=True)
     def __str__(self):
         return f"id: {self.id},amount: {self.amount}, date:{self.added_date}"
+    def serialize(self):
+        return {
+            "id": self.id,
+            "amount": self.amount,
+            "category": self.category.name,
+            "added_date": self.added_date.strftime("%b %-d %Y, %-I:%M %p"),
+            "parent_id": self.recurring_parent.id if self.recurring_parent else None,
+            "parent_title": self.recurring_parent.description if self.recurring_parent else None,
+        }
 
 
 class RecurringPayment(models.Model):

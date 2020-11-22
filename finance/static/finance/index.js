@@ -70,9 +70,13 @@ function set_listeners(){
                 credentials: "include"
             })
             .then(response => {
-                response.json()
+                // response.json()
                 if (response.status == 201){
-                    reload_balance(account_name)
+                    response.json().then(result =>{
+                        new_sub = create_rec_income(result.sub)
+                        document.getElementById("incomes_container").prepend(new_sub)
+                        reload_balance(account_name)
+                    })
                     }
             })
             // Catch any errors and log them to the console
@@ -101,7 +105,11 @@ function set_listeners(){
             .then(response => {
                 // response.json()
                 if (response.status == 201){
-                    reload_balance(account_name)
+                    response.json().then(result =>{
+                        new_sub = create_rec_income(result.sub)
+                        document.getElementById("expenses_container").prepend(new_sub)
+                        reload_balance(account_name)
+                    })
                 }
             })
             // Catch any errors and log them to the console
@@ -260,6 +268,8 @@ function reload_balance(account_name) {
 function reload_subs(account_name) {
     const subs_div = document.getElementById("rec_expenses_container")
     const rec_incomes_div = document.getElementById("rec_incomes_container")
+    const incomes_div = document.getElementById("incomes_container")
+    const expenses_div = document.getElementById("expenses_container")
     subs_div.innerHTML = ''
     rec_incomes_div.innerHTML = ''
     fetch('/accounts/'+account_name+'/recpayments')
@@ -276,6 +286,22 @@ function reload_subs(account_name) {
         payments.forEach(payment => {
             new_sub = create_rec_income(payment)
             document.getElementById("rec_incomes_container").append(new_sub)
+        });
+    });
+    fetch('/accounts/'+account_name+'/incomes')
+    .then(response => response.json())
+    .then(payments => {
+        payments.forEach(payment => {
+            new_sub = create_rec_income(payment)
+            incomes_div.append(new_sub)
+        });
+    });
+    fetch('/accounts/'+account_name+'/expenses')
+    .then(response => response.json())
+    .then(payments => {
+        payments.forEach(payment => {
+            new_sub = create_rec_income(payment)
+            expenses_div.append(new_sub)
         });
     });
 }
