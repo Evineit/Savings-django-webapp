@@ -136,66 +136,73 @@
         </form>
     </div>
     <!-- <br> -->
-    <div class="subs-container-title">
-        <h3>Active Subscriptions</h3>
-        <span class="sub-order">order by:</span>
-        <span class="sub-order">
-            <select class="sub-order-select" name="rec_exp_order" id="rec_exp_order">
-                <option selected value="nex_pay_asc">Next payment date (asc)</option>
-                <option value="nex_pay_dsc">Next payment date (dsc)</option>
-                <option value="title_asc">Title (asc)</option>
-                <option value="title_dsc">Title (dsc)</option>
-                <option value="amount_asc">Amount (asc)</option>
-                <option value="amount_dsc">Amount (dsc)</option>
-            </select>
-        </span>
-    </div>
-    <div id="rec_expenses_container" class="subs-container rounded">
-    </div>
-    <div class="subs-container-title">
-        <h3>Active Recurrent Incomes</h3>
-        <span class="sub-order">order by:</span>
-        <span class="sub-order">
-            <select class="sub-order-select" name="rec_inc_order" id="rec_inc_order">
-                <option selected value="nex_pay_asc">Next payment date (asc)</option>
-                <option value="nex_pay_dsc">Next payment date (dsc)</option>
-                <option value="title_asc">Title (asc)</option>
-                <option value="title_dsc">Title (dsc)</option>
-                <option value="amount_asc">Amount (asc)</option>
-                <option value="amount_dsc">Amount (dsc)</option>
-            </select>
-        </span>
-    </div>
-    <div id="rec_incomes_container" class="subs-container rounded">
-    </div>
-    <div class="subs-container-title">
-    <h3>Incomes</h3>
-        <span class="sub-order">order by:</span>
-        <span class="sub-order">
-            <select class="sub-order-select" name="inc_order" id="inc_order">
-                <option selected value="date_dsc">Added date (dsc)</option>
-                <option value="date_asc">Added date (asc)</option>
-                <option value="amount_dsc">Amount (dsc)</option>
-                <option value="amount_asc">Amount (asc)</option>
-            </select>
-        </span>
-    </div>
-    <div id="incomes_container" class="subs-container rounded">
-    </div>
-    <div class="subs-container-title">
-    <h3>Expenses</h3>
+    <div>
+        <div class="subs-container-title">
+            <h3>Active Subscriptions</h3>
             <span class="sub-order">order by:</span>
             <span class="sub-order">
-                <select class="sub-order-select" name="exp_order" id="exp_order">
-                    <option selected value="date_dsc">Added date (dsc)</option>
-                    <option value="date_asc">Added date (asc)</option>
-                    <option value="amount_dsc">Amount (dsc)</option>
+                <select class="sub-order-select" name="rec_exp_order" id="rec_exp_order">
+                    <option selected value="nex_pay_asc">Next payment date (asc)</option>
+                    <option value="nex_pay_dsc">Next payment date (dsc)</option>
+                    <option value="title_asc">Title (asc)</option>
+                    <option value="title_dsc">Title (dsc)</option>
                     <option value="amount_asc">Amount (asc)</option>
+                    <option value="amount_dsc">Amount (dsc)</option>
                 </select>
             </span>
         </div>
-    <div id="expenses_container" class="subs-container rounded">
-
+        <div id="rec_expenses_container" class="subs-container rounded">
+        </div>
+    </div>
+    <div>
+        <div class="subs-container-title">
+            <h3>Active Recurrent Incomes</h3>
+            <span class="sub-order">order by:</span>
+            <span class="sub-order">
+                <select class="sub-order-select" name="rec_inc_order" id="rec_inc_order">
+                    <option selected value="nex_pay_asc">Next payment date (asc)</option>
+                    <option value="nex_pay_dsc">Next payment date (dsc)</option>
+                    <option value="title_asc">Title (asc)</option>
+                    <option value="title_dsc">Title (dsc)</option>
+                    <option value="amount_asc">Amount (asc)</option>
+                    <option value="amount_dsc">Amount (dsc)</option>
+                </select>
+            </span>
+        </div>
+        <div id="rec_incomes_container" class="subs-container rounded">
+        </div>
+    </div>
+    <div>
+        <div class="subs-container-title">
+            <h3>Incomes</h3>
+                <span class="sub-order">order by:</span>
+                <span class="sub-order">
+                    <select class="sub-order-select" name="inc_order" id="inc_order">
+                        <option selected value="date_dsc">Added date (dsc)</option>
+                        <option value="date_asc">Added date (asc)</option>
+                        <option value="amount_dsc">Amount (dsc)</option>
+                        <option value="amount_asc">Amount (asc)</option>
+                    </select>
+                </span>
+            </div>
+            <div id="incomes_container" class="subs-container rounded">
+            </div>
+    </div>
+    <div>
+        <div class="subs-container-title">
+            <h3>Expenses</h3>
+                    <span class="sub-order">order by:</span>
+                    <span class="sub-order">
+                        <select class="sub-order-select" name="exp_order" id="exp_order">
+                            <option selected value="date_dsc">Added date (dsc)</option>
+                            <option value="date_asc">Added date (asc)</option>
+                            <option value="amount_dsc">Amount (dsc)</option>
+                            <option value="amount_asc">Amount (asc)</option>
+                        </select>
+                    </span>
+                </div>
+            <div id="expenses_container" class="subs-container rounded">
+            </div>
     </div>
     {% endif %}
 </div>
