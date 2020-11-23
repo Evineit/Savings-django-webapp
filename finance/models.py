@@ -44,6 +44,7 @@ class Income(models.Model):
             "amount": self.amount,
             "category": self.category.name,
             "added_date": self.added_date.strftime("%b %-d %Y, %-I:%M %p"),
+            "timestamp": self.added_date.timestamp(),
             "parent_id": self.recurring_parent.id if self.recurring_parent else None,
             "parent_title": self.recurring_parent.description if self.recurring_parent else None,
         }
@@ -62,6 +63,7 @@ class Expense(models.Model):
             "amount": self.amount,
             "category": self.category.name,
             "added_date": self.added_date.strftime("%b %-d %Y, %-I:%M %p"),
+            "timestamp": self.added_date.timestamp(),
             "parent_id": self.recurring_parent.id if self.recurring_parent else None,
             "parent_title": self.recurring_parent.description if self.recurring_parent else None,
         }
@@ -83,10 +85,9 @@ class RecurringPayment(models.Model):
             "description": self.description,
             "amount": self.amount,
             "category": self.category.name,
-            # "added_date": maybe,
             "start_date": self.start_date.strftime("%b %-d %Y, %-I:%M %p"),
-            # "end_date": self.end_date.strftime("%b %-d %Y, %-I:%M %p"),
             "next_date": self.next_payment_date().strftime(r"%d %b %Y") ,
+            "next_date_timestamp": self.next_payment_date().timestamp() ,
             "schedule_type": self.schedule_type,
         }
 
@@ -115,10 +116,9 @@ class RecurringIncome(models.Model):
             "description": self.description,
             "amount": self.amount,
             "category": self.category.name,
-            # "added_date": maybe,
             "start_date": self.start_date.strftime("%b %-d %Y, %-I:%M %p"),
-            # "end_date": self.end_date.strftime("%b %-d %Y, %-I:%M %p"),
             "next_date": self.next_payment_date().strftime(r"%d %b %Y") ,
+            "next_date_timestamp": self.next_payment_date().timestamp() ,
             "schedule_type": self.schedule_type,
         }
     def cycles_at_date(self, date:datetime = timezone.now()) -> int:
