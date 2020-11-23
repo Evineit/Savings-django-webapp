@@ -115,23 +115,27 @@ It fulfills the following requirements:
 * Wallets (accounts): Users can create new wallets
     - Accounts should have independent balanc e and payments
     - User should be able to change between accounts without reloading
-    <!-- TODO: Users should only be able to interact with their own things-->
+    <!-- TODO: Users should only be able to interact with their own things API-wise -->
+    <!-- TODO: Delete account -->
 
-* Update recurring payments: Users should be able edit any of their own payments.
+* Update recurring payments and incomes: Users should be able edit any of their own payments.
     - Users should be able to stop a subscription without deleting the previous payments.
     - Stopping or changing the amount on a recurring payment shouldn't reload the page.
     - User should be able to edit the current subscription amount, influencing next payments
   
 * Recurring incomes: Users can add recurring incomes in the current account
 
+* Order by: The incomes and expenses should be able to be ordered in the client without making another request
+    - The recurring payment can be ordered by at least their next payment date, their amount, title
+    - The incomes and expenses can be ordered by at least amount and date
+
+** Forecast: When a user clicks on Forecast, the user should be taken to a view where they see a text based forecast of the balance
+    in the selected account given the recurring payments.
+
 ** Categories: Allow users categorize the payments in common categories.
     There should be a quick add button for incomes and expenses in every category.
 
-** Movements History
-    Should it be handle in json format or in the database
-    
-** Forecast: When a user clicks on Forecast, the user should be taken to a view where they see a text based forecast of the balance
-    in the selected account given the recurring payments.
+** Logging: Maybe log?
 
 ** Graphs: Allow users to view a graph of the balance of the selected month.
 

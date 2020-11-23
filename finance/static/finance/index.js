@@ -73,7 +73,7 @@ function set_listeners(){
                 // response.json()
                 if (response.status == 201){
                     response.json().then(result =>{
-                        new_sub = create_rec_income(result.sub)
+                        new_sub = create_basic_mov(result.sub)
                         document.getElementById("incomes_container").prepend(new_sub)
                         reload_balance(account_name)
                     })
@@ -106,7 +106,7 @@ function set_listeners(){
                 // response.json()
                 if (response.status == 201){
                     response.json().then(result =>{
-                        new_sub = create_rec_income(result.sub)
+                        new_sub = create_basic_mov(result.sub)
                         document.getElementById("expenses_container").prepend(new_sub)
                         reload_balance(account_name)
                     })
@@ -292,7 +292,7 @@ function reload_subs(account_name) {
     .then(response => response.json())
     .then(payments => {
         payments.forEach(payment => {
-            new_sub = create_rec_income(payment)
+            new_sub = create_basic_mov(payment)
             incomes_div.append(new_sub)
         });
     });
@@ -300,7 +300,7 @@ function reload_subs(account_name) {
     .then(response => response.json())
     .then(payments => {
         payments.forEach(payment => {
-            new_sub = create_rec_income(payment)
+            new_sub = create_basic_mov(payment)
             expenses_div.append(new_sub)
         });
     });
@@ -340,6 +340,54 @@ function create_sub(payment){
     element.append(top_div)
     element.append(bot_div)
 
+    return element  
+}
+
+function create_basic_mov(payment){
+    const element = document.createElement('div')
+    const top_div = document.createElement('div')
+    // const bot_div = document.createElement('div')
+    const title = document.createElement('h6')
+    const amount = document.createElement('h6')
+    // const stop_button = document.createElement('button')
+    // const amount_button = document.createElement('button')
+    element.className = "subs"
+    top_div.className = "subs-top-container"
+    element.dataset.id = payment.id
+    title.style = "flex: 1;"
+    // stop_button.innerText = "Stop"
+    // stop_button.className = "btn btn-outline-danger btn-hidden"
+    // stop_button.addEventListener('click', () =>{
+    //     hide_payment(element)
+    //     let csrftoken = getCookie('csrftoken');
+    //     fetch(`/recincomes/${payment.id}/stop`,{
+    //         method: 'PUT',
+    //         body: JSON.stringify({
+    //             // TODO: remove maybe
+    //             remove_last_movement: false,
+    //         }),
+    //         headers:{
+    //             "X-CSRFToken": csrftoken
+    //         }
+    //     })
+    //     .catch( error => {
+    //         console.log('Error:', error);
+    //     })
+    // })
+    // amount_button.innerText = "Change amount"
+    // amount_button.className = "btn btn-outline-primary btn-hidden"
+    // amount_button.addEventListener('click', () =>{
+    //     change_recincomes_amount(payment.id, amount)
+    // })
+
+    title.innerHTML = `id: ${payment.id}, Added date: ${payment.added_date}`;
+    amount.innerHTML = `Amount:${payment.amount}$`
+    top_div.append(title)
+    top_div.append(amount)
+    // bot_div.append(amount_button)  
+    // bot_div.append(stop_button)  
+    element.append(top_div)
+    // element.append(bot_div)
     return element  
 }
 

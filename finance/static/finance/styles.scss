@@ -35,7 +35,42 @@ div#content {
     }
   }
 }
-
+div.subs-container-title{
+  h3{
+    flex:1;
+  }
+  display: flex;
+  .title{
+    font-size: 1.75rem;
+  }
+  .sub-order{
+    margin: auto 5px;
+    color: #676767;
+  }
+  .sub-order-select{
+    display: inline-block;
+    width: 100%;
+    height: calc(1.5em + .75rem + 2px);
+    padding: .375rem 1.75rem .375rem .75rem;
+    font-size: 1rem;
+    font-weight: 400;
+    line-height: 1.5;
+    color: #495057;
+    font-weight: 700;
+    vertical-align: middle;
+    border: 1px solid #ced4da;
+    border-radius: 2rem;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+    background: #fff url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' width='4' height='5' viewBox='0 0 4 5'%3e%3cpath fill='%23343a40' d='M2 0L0 2h4zm0 5L0 3h4z'/%3e%3c/svg%3e") no-repeat right .75rem center/8px 10px;
+  }
+  .sub-order-select:focus{
+      border-color: #80bdff;
+      outline: 0;
+      box-shadow: 0 0 0 0.2rem rgba(0,123,255,.25);  
+  }
+}
 div.subs-container {
   margin: 5px;
   // padding: 5px;
