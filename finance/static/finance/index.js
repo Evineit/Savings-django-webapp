@@ -2,11 +2,23 @@ document.addEventListener('DOMContentLoaded', function() {
     reload_subs("Default")
     set_buttons()
     set_listeners()
-    
+    document.getElementById("rec_exp_order").addEventListener('change',(e) =>{
+        order_rec_container_by(document.getElementById("rec_expenses_container"),document.getElementById("rec_exp_order").value)
+    })
+    document.getElementById("rec_inc_order").addEventListener('change',(e) =>{
+        order_rec_container_by(document.getElementById("rec_incomes_container"),document.getElementById("rec_inc_order").value)
+    })
+    document.getElementById("inc_order").addEventListener('change',(e) =>{
+        order_container_by(document.getElementById("incomes_container"),document.getElementById("inc_order").value)
+    })
+    document.getElementById("exp_order").addEventListener('change',(e) =>{
+        order_container_by(document.getElementById("expenses_container"),document.getElementById("exp_order").value)
+    })
 });
 
 function set_listeners(){
     let account_name = document.querySelector('#accountName').dataset.accountName;
+
     document.querySelector('#changeAccForm>form').onsubmit = function() {
         const new_account = document.getElementById("change_account").value
         if (new_account == account_name){
@@ -19,7 +31,7 @@ function set_listeners(){
         set_listeners()
         reload_balance(new_account)
         reload_subs(new_account)
-        closeForm()
+        closeForm()  
         return false
     }
 
@@ -278,6 +290,7 @@ function reload_subs(account_name) {
             payments.forEach(payment => {
                 new_sub = create_sub(payment)
                 document.getElementById("rec_expenses_container").append(new_sub)
+                order_rec_container_by(document.getElementById("rec_expenses_container"),"nex_pay_asc")
             });
         });
     fetch('/accounts/'+account_name+'/recincomes')
@@ -287,6 +300,7 @@ function reload_subs(account_name) {
             new_sub = create_rec_income(payment)
             document.getElementById("rec_incomes_container").append(new_sub)
         });
+        order_rec_container_by(document.getElementById("rec_incomes_container"),"nex_pay_asc")
     });
     fetch('/accounts/'+account_name+'/incomes')
     .then(response => response.json())
@@ -295,6 +309,7 @@ function reload_subs(account_name) {
             new_sub = create_basic_mov(payment)
             incomes_div.append(new_sub)
         });
+        order_container_by(document.getElementById("incomes_container"),"date_dsc")
     });
     fetch('/accounts/'+account_name+'/expenses')
     .then(response => response.json())
@@ -303,6 +318,7 @@ function reload_subs(account_name) {
             new_sub = create_basic_mov(payment)
             expenses_div.append(new_sub)
         });
+        order_container_by(document.getElementById("expenses_container"),"date_dsc")
     });
 }
 
@@ -317,6 +333,9 @@ function create_sub(payment){
     element.className = "subs"
     top_div.className = "subs-top-container"
     element.dataset.id = payment.id
+    element.dataset.title = payment.description
+    element.dataset.amount = payment.amount
+    element.dataset.next_date = payment.next_date_timestamp
     title.style = "flex: 1;"
     stop_button.innerText = "Stop"
     stop_button.className = "btn btn-outline-danger btn-hidden"
@@ -354,6 +373,8 @@ function create_basic_mov(payment){
     element.className = "subs"
     top_div.className = "subs-top-container"
     element.dataset.id = payment.id
+    element.dataset.amount = payment.amount
+    element.dataset.next_date = payment.timestamp
     title.style = "flex: 1;"
     // stop_button.innerText = "Stop"
     // stop_button.className = "btn btn-outline-danger btn-hidden"
@@ -402,6 +423,9 @@ function create_rec_income(payment){
     element.className = "subs"
     top_div.className = "subs-top-container"
     element.dataset.id = payment.id
+    element.dataset.title = payment.description
+    element.dataset.amount = payment.amount
+    element.dataset.next_date = payment.next_date_timestamp
     title.style = "flex: 1;"
     stop_button.innerText = "Stop"
     stop_button.className = "btn btn-outline-danger btn-hidden"
@@ -552,3 +576,62 @@ function today() {
     return today
 }
 
+function sort_by_amount_asc(a,b){
+    if (+a.dataset.amount > +b.dataset.amount) {
+      return 1;
+    }
+    if (+a.dataset.amount < +b.dataset.amount) {
+      return -1;
+    }
+    return 0;  
+}
+function sort_by_timestamp(a,b){
+    if (+a.dataset.next_date > +b.dataset.next_date) {
+        return 1;
+      }
+      if (+a.dataset.next_date < +b.dataset.next_date) {
+        return -1;
+      }
+      return 0;  
+}
+
+function order_rec_container_by(containerElem, sort){
+    arr = Array.from(containerElem.children)
+    containerElem.innerHTML = ''
+    if (sort == "amount_asc"){
+        new_arr = arr.sort(sort_by_amount_asc);
+    }else if (sort == "amount_dsc"){
+        new_arr = arr.sort(sort_by_amount_asc).reverse();
+    }else if (sort == "nex_pay_asc"){
+        new_arr = arr.sort(sort_by_timestamp)
+    }else if (sort == "nex_pay_dsc"){
+        new_arr = arr.sort(sort_by_timestamp).reverse()
+    }else if (sort == "title_asc"){
+        new_arr = arr.sort((a,b) => a.dataset.title.localeCompare(b.dataset.title))
+    }else if (sort == "title_dsc"){
+        new_arr = arr.sort((a,b) => b.dataset.title.localeCompare(a.dataset.title)) 
+    }else{
+        return
+    }
+    new_arr.forEach(elem =>{
+        containerElem.append(elem)
+    })
+  }
+  function order_container_by(containerElem, sort){
+    arr = Array.from(containerElem.children)
+    containerElem.innerHTML = ''
+    if (sort == "amount_asc"){
+        new_arr = arr.sort(sort_by_amount_asc);
+    }else if (sort == "amount_dsc"){
+        new_arr = arr.sort(sort_by_amount_asc).reverse();
+    }else if (sort == "date_asc"){
+        new_arr = arr.sort(sort_by_timestamp)
+    }else if (sort == "date_dsc"){
+        new_arr = arr.sort(sort_by_timestamp).reverse()
+    }else{
+        return
+    }
+    new_arr.forEach(elem =>{
+        containerElem.append(elem)
+    })
+  }
