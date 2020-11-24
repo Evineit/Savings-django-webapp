@@ -293,7 +293,6 @@ def rec_payment(request, id):
         if not data: return JsonResponse({"error": "Empty PUT request"}, status=400)
         action = data.get("action")
         if not action: return JsonResponse({"error": "No action in request"}, status=400)
-
         if action == "stop":
             payment.end_date = timezone.now()
             payment.save()
@@ -337,9 +336,9 @@ def rec_income_stop(request,id):
     except:
             return JsonResponse({"error": f"Payment with id: {id}. Doesn't exist"}, status=400) 
     if request.method == "PUT":
-        data = json.loads(request.body)
+        # data = json.loads(request.body)
         # TODO: remove maybe, cause is not needes if remove last payment not implemented
-        if not data: return JsonResponse({"error": "Empty PUT request"}, status=400)  
+        # if not data: return JsonResponse({"error": "Empty PUT request"}, status=400)  
         payment.end_date = timezone.now()
         payment.save()
         return JsonResponse({"msg": f"Payment with id: {id}. Has been stopped"}, status=200)

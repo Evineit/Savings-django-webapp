@@ -289,7 +289,6 @@ class PostTestCase(TestCase):
         self.assertEqual(rec_pay_response.status_code,200)    
         stop_response = c.put('/recpayments/' + str(pay_id), data={
             'action': 'stop',
-            'remove_last_movement': False
         }, content_type='application/json')
         self.assertEqual(stop_response.status_code, 200)
         response = c.get('/accounts/default/recpayments')
@@ -312,9 +311,7 @@ class PostTestCase(TestCase):
         pay_id = response.json()[0].get("id")
         rec_pay_response = c.get(f'/recincomes/{str(pay_id)}') 
         self.assertEqual(rec_pay_response.status_code,200)    
-        stop_response = c.put(f'/recincomes/{pay_id}/stop', data={
-            'remove_last_movement': False
-        }, content_type='application/json')
+        stop_response = c.put(f'/recincomes/{pay_id}/stop', content_type='application/json')
         self.assertEqual(stop_response.status_code, 200)
         response = c.get('/accounts/default/recincomes')
         self.assertEqual(len(response.json()), 0)
