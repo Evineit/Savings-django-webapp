@@ -119,7 +119,6 @@ It fulfills the following requirements:
 * Wallets (accounts): Users can create new wallets
     - Accounts should have independent balance e and payments
     - User should be able to change between accounts without reloading
-    <!-- TODO: Users should only be able to interact with their own things API-wise -->
     <!-- FIX:  use id instead of names to avoid repeated name error-->
 
 * Update recurring payments and incomes: Users should be able edit any of their own payments.

@@ -92,6 +92,7 @@ def account(request):
         if not title or amount==None:return JsonResponse({"error": "Request info incomplete or missing"}, status=400)
         new_acc = Account.objects.create(user=user,balance=0, name=title)
         category = Category.objects.get(name="Default")
+        # TODO: add expense if starting amount < 0
         if amount: Income.objects.create(account=new_acc,amount=amount,category=category)
         return JsonResponse({
                     "msg": "Account (wallet) added successfully"
@@ -278,8 +279,9 @@ def all_rec_incomes(request, account):
 
 @login_required
 def rec_payment(request, id):
+    user = request.user
     try:
-            payment = RecurringPayment.objects.get(id=id)
+            payment = user.rec_expenses.get(id=id)
     except:
             return JsonResponse({"error": f"Payment with id: {id}. Doesn't exist"}, status=400) 
     if request.method == "GET":
@@ -311,8 +313,9 @@ def rec_payment(request, id):
 
 @login_required
 def rec_income(request, id):
+    user = request.user
     try:
-            payment = RecurringIncome.objects.get(id=id)
+            payment = user.rec_incomes.get(id=id)
     except:
             return JsonResponse({"error": f"Payment with id: {id}. Doesn't exist"}, status=400) 
     if request.method == "GET":
@@ -322,8 +325,9 @@ def rec_income(request, id):
 
 @login_required
 def rec_income_stop(request,id):
+    user = request.user
     try:
-            payment = RecurringIncome.objects.get(id=id)
+            payment = user.rec_incomes.get(id=id)
     except:
             return JsonResponse({"error": f"Payment with id: {id}. Doesn't exist"}, status=400) 
     if request.method == "PUT":
@@ -338,8 +342,9 @@ def rec_income_stop(request,id):
 
 @login_required
 def rec_income_edit(request,id):
+    user = request.user
     try:
-            payment = RecurringIncome.objects.get(id=id)
+            payment = user.rec_incomes.get(id=id)
     except:
             return JsonResponse({"error": f"Payment with id: {id}. Doesn't exist"}, status=400) 
     if request.method == "PUT":
