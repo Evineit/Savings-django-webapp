@@ -17,7 +17,7 @@ def index(request):
         if (not request.user.accounts.all().count()):
             default_account = Account(user = request.user,balance=0,name="Default")
             default_account.save()
-        default_account = request.user.accounts.get(name="Default")
+        default_account = request.user.accounts.first()
         return render(request, "finance/index.html",{
             "account":default_account
         })
@@ -96,10 +96,23 @@ def account(request):
                     "msg": "Account (wallet) added successfully"
             }, status=201)
     elif request.method == "GET":
-        return JsonResponse({"error": "TODO."}, status=400)
+        accounts = user.accounts.all()
+        return JsonResponse([acc.name for acc in accounts], safe=False, status=200)    
     else:
         return JsonResponse({"error": "POST or GET request required."}, status=400)
 
+def accounts_delete(request, account):
+    user = request.user
+    if request.method == "DELETE":
+        try:
+            user_account = user.accounts.get(name=account)
+        except:
+            return JsonResponse({"error": "Account doesn't exist"}, status=400)
+        user_account.delete()
+        return JsonResponse({
+                        "msg": "User account removed successfully"
+                }, status=200) 
+    return JsonResponse({"error": "Delete request required."}, status=400)
 
 def accounts(request, account):
     user = request.user
