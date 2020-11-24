@@ -3,6 +3,7 @@ from django.shortcuts import render
 from django.http import HttpResponse, HttpResponseRedirect, JsonResponse
 from django.contrib.auth import authenticate, login, logout
 from django.urls import reverse
+from django.contrib.auth.decorators import login_required
 from django.db import IntegrityError
 
 from decimal import Decimal
@@ -10,7 +11,7 @@ from decimal import Decimal
 from django.utils.timezone import activate
 from .models import *
 from datetime import datetime
-# TODO: login requiered decorator
+
 # Create your views here. 
 def index(request):
     if (request.user.is_authenticated):
@@ -77,7 +78,7 @@ def register(request):
         return HttpResponseRedirect(reverse("index"))
     else:
         return render(request, "finance/register.html")
-
+@login_required
 def account(request):
     user = request.user
     if request.method == "POST":
@@ -100,7 +101,7 @@ def account(request):
         return JsonResponse([acc.name for acc in accounts], safe=False, status=200)    
     else:
         return JsonResponse({"error": "POST or GET request required."}, status=400)
-
+@login_required
 def accounts_delete(request, account):
     user = request.user
     if request.method == "DELETE":
@@ -114,6 +115,7 @@ def accounts_delete(request, account):
                 }, status=200) 
     return JsonResponse({"error": "Delete request required."}, status=400)
 
+@login_required
 def accounts(request, account):
     user = request.user
     if request.method == "POST":
@@ -194,6 +196,7 @@ def accounts(request, account):
     else:
         return JsonResponse({"error": "POST or GET request required."}, status=400)
 
+@login_required
 def all_incomes(request, account):
     user = request.user
     if request.method == "GET":
@@ -206,6 +209,7 @@ def all_incomes(request, account):
     else:
         return JsonResponse({"error": "GET request required."}, status=400) 
 
+@login_required
 def all_expenses(request, account):
     user = request.user
     if request.method == "GET":
@@ -218,6 +222,7 @@ def all_expenses(request, account):
     else:
         return JsonResponse({"error": "GET request required."}, status=400) 
 
+@login_required
 def all_rec_payments(request, account):
     user = request.user
     if request.method == "GET":
@@ -230,6 +235,7 @@ def all_rec_payments(request, account):
     else:
         return JsonResponse({"error": "GET request required."}, status=400)
 
+@login_required
 def all_rec_incomes(request, account):
     user = request.user
     if request.method == "GET":
@@ -270,6 +276,7 @@ def all_rec_incomes(request, account):
     else:
         return JsonResponse({"error": "GET or POST request required."}, status=400)
 
+@login_required
 def rec_payment(request, id):
     try:
             payment = RecurringPayment.objects.get(id=id)
@@ -302,6 +309,7 @@ def rec_payment(request, id):
     else:
         return JsonResponse({"error": "GET or PUT request required."}, status=400)
 
+@login_required
 def rec_income(request, id):
     try:
             payment = RecurringIncome.objects.get(id=id)
@@ -312,6 +320,7 @@ def rec_income(request, id):
     else:
         return JsonResponse({"error": "GET request required."}, status=400)
 
+@login_required
 def rec_income_stop(request,id):
     try:
             payment = RecurringIncome.objects.get(id=id)
@@ -327,6 +336,7 @@ def rec_income_stop(request,id):
     else:
         return JsonResponse({"error": "PUT request required."}, status=400)
 
+@login_required
 def rec_income_edit(request,id):
     try:
             payment = RecurringIncome.objects.get(id=id)

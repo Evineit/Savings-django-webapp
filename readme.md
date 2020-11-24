@@ -133,6 +133,8 @@ It fulfills the following requirements:
     - The recurring payment can be ordered by at least their next payment date, their amount, title
     - The incomes and expenses can be ordered by at least amount and date
 
+** Response msg as alert handler
+
 ** Forecast: When a user clicks on Forecast, the user should be taken to a view where they see a text based forecast of the balance
     in the selected account given the recurring payments.
 
