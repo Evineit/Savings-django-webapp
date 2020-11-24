@@ -458,10 +458,6 @@ function create_rec_income(payment){
         let csrftoken = getCookie('csrftoken');
         fetch(`/recincomes/${payment.id}/stop`,{
             method: 'PUT',
-            body: JSON.stringify({
-                // TODO: remove maybe
-                remove_last_movement: false,
-            }),
             headers:{
                 "X-CSRFToken": csrftoken
             }
@@ -556,7 +552,6 @@ function stop_payment(payment_id){
         method: 'PUT',
         body: JSON.stringify({
             action: 'stop',
-            remove_last_movement: false,
         }),
         headers:{
             "X-CSRFToken": csrftoken
