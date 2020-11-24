@@ -281,7 +281,9 @@ def all_rec_incomes(request, account):
 def rec_payment(request, id):
     user = request.user
     try:
-            payment = user.rec_expenses.get(id=id)
+            payment = RecurringPayment.objects.get(id=id)
+            if payment.account not in user.accounts.all(): 
+                return JsonResponse({"error": f"The user does not have access rights to the payment with id: {id}"}, status=403) 
     except:
             return JsonResponse({"error": f"Payment with id: {id}. Doesn't exist"}, status=400) 
     if request.method == "GET":
@@ -315,7 +317,9 @@ def rec_payment(request, id):
 def rec_income(request, id):
     user = request.user
     try:
-            payment = user.rec_incomes.get(id=id)
+            payment = RecurringIncome.objects.get(id=id)
+            if payment.account not in user.accounts.all(): 
+                return JsonResponse({"error": f"The user does not have access rights to the payment with id: {id}"}, status=403) 
     except:
             return JsonResponse({"error": f"Payment with id: {id}. Doesn't exist"}, status=400) 
     if request.method == "GET":
@@ -327,7 +331,9 @@ def rec_income(request, id):
 def rec_income_stop(request,id):
     user = request.user
     try:
-            payment = user.rec_incomes.get(id=id)
+            payment = RecurringIncome.objects.get(id=id)
+            if payment.account not in user.accounts.all(): 
+                return JsonResponse({"error": f"The user does not have access rights to the payment with id: {id}"}, status=403) 
     except:
             return JsonResponse({"error": f"Payment with id: {id}. Doesn't exist"}, status=400) 
     if request.method == "PUT":
@@ -344,7 +350,9 @@ def rec_income_stop(request,id):
 def rec_income_edit(request,id):
     user = request.user
     try:
-            payment = user.rec_incomes.get(id=id)
+        payment = RecurringIncome.objects.get(id=id)
+        if payment.account not in user.accounts.all(): 
+            return JsonResponse({"error": f"The user does not have access rights to the payment with id: {id}"}, status=403) 
     except:
             return JsonResponse({"error": f"Payment with id: {id}. Doesn't exist"}, status=400) 
     if request.method == "PUT":
