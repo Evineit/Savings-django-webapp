@@ -225,5 +225,11 @@ div.subs-container .subs:hover .btn-hidden {
     max-width: none;
   }
 }
+.center-full {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
 
 /*# sourceMappingURL=styles.css.map */

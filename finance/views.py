@@ -22,7 +22,7 @@ def index(request):
         return render(request, "finance/index.html",{
             "account":default_account
         })
-    return render(request, "finance/index.html")
+    return render(request, "finance/nolog.html")
     
 
 
@@ -337,7 +337,6 @@ def rec_income_stop(request,id):
             return JsonResponse({"error": f"Payment with id: {id}. Doesn't exist"}, status=400) 
     if request.method == "PUT":
         # data = json.loads(request.body)
-        # TODO: remove maybe, cause is not needes if remove last payment not implemented
         # if not data: return JsonResponse({"error": "Empty PUT request"}, status=400)  
         payment.end_date = timezone.now()
         payment.save()

@@ -120,6 +120,7 @@ It fulfills the following requirements:
     - Accounts should have independent balance e and payments
     - User should be able to change between accounts without reloading
     <!-- FIX:  use id instead of names to avoid repeated name error-->
+    <!-- FIX:  use unique together in model to avoid repeated accounts name error-->
 
 * Update recurring payments and incomes: Users should be able edit any of their own payments.
     - Users should be able to stop a subscription without deleting the previous payments.
