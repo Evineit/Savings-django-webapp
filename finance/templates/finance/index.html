@@ -17,9 +17,10 @@
         <div class="acc-container">
             <br>
             <span>Current wallet:</span>
-            <span id="accountName" data-account-name="{{account.name}}">{{ account.name }}</span>
-            <span id="acc-change">Change wallet</span>
+            <span id="accountName" data-account-name="{{user.accounts.all.first.name}}">{{ user.accounts.all.first.name }}</span>
             <span id="acc-new">New wallet</span>
+            <span id="acc-change">Change wallet</span>
+            <span id="acc-delete">Delete wallet</span>
         </div>
     </div>
     <div class="form-popup" id="incomesForm">
@@ -121,6 +122,14 @@
                 </select>
             </div>
             <button type="submit" class="btn">Done</button>
+            <button type="button" class="btn cancel" onclick="closeForm()">Close</button>
+        </form>
+    </div>
+    <div id="delete_accForm" class="form-popup">
+        <form class="form-container rounded">
+            <h1>Delete current account</h1>
+            <b>Are you sure you want to delete the current account?</b>
+            <button type="submit" class="btn">Confirm</button>
             <button type="button" class="btn cancel" onclick="closeForm()">Close</button>
         </form>
     </div>
