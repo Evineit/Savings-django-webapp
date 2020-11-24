@@ -92,8 +92,8 @@ def account(request):
         if not title or amount==None:return JsonResponse({"error": "Request info incomplete or missing"}, status=400)
         new_acc = Account.objects.create(user=user,balance=0, name=title)
         category = Category.objects.get(name="Default")
-        # TODO: add expense if starting amount < 0
-        if amount: Income.objects.create(account=new_acc,amount=amount,category=category)
+        if amount>0: Income.objects.create(account=new_acc,amount=abs(amount),category=category)
+        elif amount<0: Expense.objects.create(account=new_acc,amount=abs(amount),category=category)
         return JsonResponse({
                     "msg": "Account (wallet) added successfully"
             }, status=201)
