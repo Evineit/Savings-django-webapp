@@ -334,6 +334,9 @@ function reload_subs(account_name) {
     const expenses_div = document.getElementById("expenses_container")
     subs_div.innerHTML = ''
     rec_incomes_div.innerHTML = ''
+    incomes_div.innerHTML = ''
+    expenses_div.innerHTML = ''
+    
     fetch('/accounts/'+account_name+'/recpayments')
         .then(response => response.json())
         .then(payments => {
