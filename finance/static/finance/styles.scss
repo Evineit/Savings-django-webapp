@@ -24,7 +24,7 @@ div#content {
     #accountName{
       color: #cfd2d6;
     }
-    #acc-change, #acc-new{
+    #acc-change, #acc-new, #acc-delete{
       cursor: pointer;
     }
     #acc-change:hover{
@@ -32,6 +32,9 @@ div#content {
     }
     #acc-new:hover{
       color: #28a745;
+    }
+    #acc-delete:hover{
+      color: red;
     }
   }
 }
@@ -95,9 +98,12 @@ div.subs-container {
     .subs-top-container{
       display: flex;
     }
-    // .subs-bot-container{
-
-    // }
+  }
+  .subs-expense{
+    background-image: linear-gradient(to right, rgba(255,0,0,0)50%, rgba(220,53,69,1));
+  }
+  .subs-income{
+    background-image: linear-gradient(to right, rgba(255,0,0,0)50%, rgba(0, 255, 72, 0.7));
   }
   .btn-hidden{
     visibility: hidden;
@@ -184,6 +190,12 @@ div.subs-container {
   margin: 5px 0 22px 0;
   border: none;
   background: #f1f1f1;
+}
+
+.form-container {
+  b{
+    color: darkslategrey;
+  }
 }
 
 /* When the inputs get focus, do something */

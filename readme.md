@@ -5,7 +5,7 @@ Personal Savings website for managing expenses and subscriptions.
 In the distribution code is a Django project called project5 that contains a single app called finance. This entire application is just a single page, with JavaScript used to control the user interface. Let’s now take a closer look at the distribution code to see how that works.
 I may refer to the account model as wallet or account. 
 
-Take a look at finance/urls.py and notice that the default route loads an index function in views.py. So let’s up views.py and look at the index function. Notice that, as long as the user is signed in, this function creates a default account if the user doesn't have any accounts then it renders the finance/index.html template.
+Take a look at finance/urls.py there are the routes to the api but let focus and notice that the default route loads an index function in views.py. So let’s up views.py and look at the index function. Notice that, as long as the user is signed in, this function creates a default account if the user doesn't have any accounts then it renders the finance/index.html template.
 
  Let’s look at that template, stored at finance/templates/finance/index.html. You’ll notice that first the page shows the balance of the current account , after this it has a sequence of buttons for adding incomes and expense in single or recurrent instance. Below that, notice that this page has a section where you get info about the account you are working with, as well as the sequence of buttons to change or add new accounts. Below the next section is each defined by a div element containing a different form. The first four contains the necessary inputs to add incomes and expenses. The next one is to change the amount of the recurrent movements, the last two contain the forms used on account management to change and create accounts.
  At the end of the template there are four div used as containers for the recurring payments and recurring incomes and simple incomes and expenses. They are filled with javascript fetch calls.
@@ -13,8 +13,9 @@ Take a look at finance/urls.py and notice that the default route loads an index 
 Notice at the bottom of index.html, the JavaScript file finance/index.js is included. Open that file, stored at finance/static/finance/index.js, and take a look. Notice that when the DOM content of the page has been loaded, we load expenses and incomes in this account adding them to the respective container then we attach event listeners to each of the buttons and the selects inputs to order the containers finally the forms onsubmit functions are set. When the add income button is clicked, for example, we call the closeForm, then calling openForm with the argument "incomes";What do these functions do? The closeForm function first closes any open form. Then openForm show the form (by setting its style.display property to none). After that, if the form is submitted the function takes all of the form input fields (where the user might type in the amount) and sets their value to the empty string '' to clear them out then it makes a post request to the API creating the income. There are other functions and request linked to the forms for handling the creation of the expenses and incomes as well as the accounts logic. The function today at the end of the javascript is to set the value of the date input for the recurring movements creation white todays date. 
 I want to talk about the ordering clint-side instead of server-side, i believe its better to request all the incomes/expenses and then ordering them in order to reduce the amount of database queries, thats why I didn't do pagination like in the las project.
 
+Now let's get back to the views.py, as we have seen the index function, we will start with the account and accounts functions, these 2 manage the creation of accounts and the the request for getting the current balance in the account from the user with the name <str:account> given as parameter. The second function uses the account model with the function update_balance that value is then returned in a Json response in order to update the balance shown in the template. The next function have a pattern all_incomes, all_expenses, all_***** these are used to get the objects associated with the account and to add new incomes and expenses, at the end this functions return (if successful) a serialized version of the new add object. After this there are functions to modify the previous mentioned objects with PUT request, if successful the return a msg.
 
-
+The last thing we are gonna look is models.py and the complementary module util.py, there are 7 models including the user, we can see how the incomes and expenses models are fairly simple, even so they have a serialize function which is used in the previously seen views.py,the more complex models are the account, the recurrent expenses and the recurrent incomes, first we'll focus in the account model. The account model has a update_balance function that takes the sum of the account expenses and incomes, this affects one of its fields but there is something tricky the function doesn't appear to be taking in account the recurrent payment and expenses, but it does.
 
 
 # API
@@ -22,8 +23,8 @@ You’ll get to add/delete accounts, add/delete expenses, add/delete incomes, ad
 
 This application supports the following API routes:
 
-<!-- GET /accounts/
-- Get user accounts -->
+GET /accounts/
+- Get user accounts
 
 POST /accounts/
 - Add new account/wallet
@@ -32,11 +33,11 @@ GET /accounts/<str:account>
 - Get Account info (Balance)
 <!-- - Responds a Json with account info like balance -->
 
-<!--
-DELETE /accounts/<str:account>
+DELETE /accounts/<str:account>/delete
 - Manage the default index account if default is deleted
-- Delete Account | Confirmation needed | checkbox 
+- Delete Account | Confirmation needed 
 
+<!--
 Put /accounts/<str:account>/name
 - Manage the default index account if default name is changed
 - Change account name
@@ -119,7 +120,7 @@ It fulfills the following requirements:
     - Accounts should have independent balance e and payments
     - User should be able to change between accounts without reloading
     <!-- TODO: Users should only be able to interact with their own things API-wise -->
-    <!-- TODO: Delete account -->
+    <!-- FIX:  use id instead of names to avoid repeated name error-->
 
 * Update recurring payments and incomes: Users should be able edit any of their own payments.
     - Users should be able to stop a subscription without deleting the previous payments.

@@ -1,5 +1,6 @@
 document.addEventListener('DOMContentLoaded', function() {
-    reload_subs("Default")
+    starting_acc = document.getElementById('accountName').innerHTML
+    reload_subs(starting_acc)
     set_buttons()
     set_listeners()
     document.getElementById("rec_exp_order").addEventListener('change',(e) =>{
@@ -34,6 +35,49 @@ function set_listeners(){
         closeForm()  
         return false
     }
+    document.querySelector('#delete_accForm>form').onsubmit = function() {
+        let csrftoken = getCookie('csrftoken');
+        fetch(`/accounts/${account_name}/delete`,{
+            method: 'DELETE',
+            headers:{
+                "X-CSRFToken": csrftoken
+            }
+        })
+        .then( response =>{
+            if (response.ok){
+                document.querySelector(`#change_account>option[value="${account_name}"]`)
+                let csrftoken = getCookie('csrftoken');
+                fetch('/accounts',{
+                    method: 'GET',
+                    headers:{
+                        "X-CSRFToken": csrftoken
+                    }
+                })
+                .then(response =>{
+                    if (response.ok){
+                        response.json().then(result=>{
+                            const new_account = result[0]
+                            const current_name = document.querySelector('#accountName')
+                            current_name.innerHTML = new_account
+                            current_name.dataset.accountName = new_account
+                            set_listeners()
+                            reload_balance(new_account)
+                            reload_subs(new_account)
+                            closeForm()
+                        })
+                    }
+                })
+                .catch( error => {
+                    console.log('Error:', error);
+                })
+                 
+            }
+        })
+        .catch( error => {
+            console.log('Error:', error);
+        })
+        return false
+    }
 
     document.querySelector('#newAccForm>form').onsubmit = function() {
         const title = document.querySelector('#newAccForm>form>input[name="title"]').value;
@@ -63,7 +107,7 @@ function set_listeners(){
         return false
         
     }
-
+    
 
     document.querySelector('#incomesForm>form').onsubmit = function() {
         const amount = document.querySelector('#incomesForm>form>input').value;
@@ -86,6 +130,7 @@ function set_listeners(){
                 if (response.status == 201){
                     response.json().then(result =>{
                         new_sub = create_basic_mov(result.sub)
+                        new_sub.className += " subs-income"
                         document.getElementById("incomes_container").prepend(new_sub)
                         reload_balance(account_name)
                     })
@@ -119,6 +164,7 @@ function set_listeners(){
                 if (response.status == 201){
                     response.json().then(result =>{
                         new_sub = create_basic_mov(result.sub)
+                        new_sub.className += " subs-expense" 
                         document.getElementById("expenses_container").prepend(new_sub)
                         reload_balance(account_name)
                     })
@@ -236,6 +282,10 @@ function set_buttons() {
         closeForm()
         openForm("newAcc")
     }
+    document.querySelector('#acc-delete').onclick = () => {
+        closeForm()
+        openForm("delete_acc")
+    }
 
 }
 
@@ -307,6 +357,7 @@ function reload_subs(account_name) {
     .then(payments => {
         payments.forEach(payment => {
             new_sub = create_basic_mov(payment)
+            new_sub.className+= " subs-income"
             incomes_div.append(new_sub)
         });
         order_container_by(document.getElementById("incomes_container"),"date_dsc")
@@ -316,6 +367,7 @@ function reload_subs(account_name) {
     .then(payments => {
         payments.forEach(payment => {
             new_sub = create_basic_mov(payment)
+            new_sub.className += " subs-expense"
             expenses_div.append(new_sub)
         });
         order_container_by(document.getElementById("expenses_container"),"date_dsc")
@@ -330,7 +382,7 @@ function create_sub(payment){
     const amount = document.createElement('h6')
     const stop_button = document.createElement('button')
     const amount_button = document.createElement('button')
-    element.className = "subs"
+    element.className = "subs subs-expense"
     top_div.className = "subs-top-container"
     element.dataset.id = payment.id
     element.dataset.title = payment.description
@@ -365,50 +417,19 @@ function create_sub(payment){
 function create_basic_mov(payment){
     const element = document.createElement('div')
     const top_div = document.createElement('div')
-    // const bot_div = document.createElement('div')
     const title = document.createElement('h6')
     const amount = document.createElement('h6')
-    // const stop_button = document.createElement('button')
-    // const amount_button = document.createElement('button')
     element.className = "subs"
     top_div.className = "subs-top-container"
     element.dataset.id = payment.id
     element.dataset.amount = payment.amount
     element.dataset.next_date = payment.timestamp
     title.style = "flex: 1;"
-    // stop_button.innerText = "Stop"
-    // stop_button.className = "btn btn-outline-danger btn-hidden"
-    // stop_button.addEventListener('click', () =>{
-    //     hide_payment(element)
-    //     let csrftoken = getCookie('csrftoken');
-    //     fetch(`/recincomes/${payment.id}/stop`,{
-    //         method: 'PUT',
-    //         body: JSON.stringify({
-    //             // TODO: remove maybe
-    //             remove_last_movement: false,
-    //         }),
-    //         headers:{
-    //             "X-CSRFToken": csrftoken
-    //         }
-    //     })
-    //     .catch( error => {
-    //         console.log('Error:', error);
-    //     })
-    // })
-    // amount_button.innerText = "Change amount"
-    // amount_button.className = "btn btn-outline-primary btn-hidden"
-    // amount_button.addEventListener('click', () =>{
-    //     change_recincomes_amount(payment.id, amount)
-    // })
-
     title.innerHTML = `id: ${payment.id}, Added date: ${payment.added_date}`;
     amount.innerHTML = `Amount:${payment.amount}$`
     top_div.append(title)
     top_div.append(amount)
-    // bot_div.append(amount_button)  
-    // bot_div.append(stop_button)  
     element.append(top_div)
-    // element.append(bot_div)
     return element  
 }
 
@@ -420,7 +441,7 @@ function create_rec_income(payment){
     const amount = document.createElement('h6')
     const stop_button = document.createElement('button')
     const amount_button = document.createElement('button')
-    element.className = "subs"
+    element.className = "subs subs-income"
     top_div.className = "subs-top-container"
     element.dataset.id = payment.id
     element.dataset.title = payment.description

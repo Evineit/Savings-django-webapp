@@ -22,7 +22,7 @@ div#content div.acc-container span {
 div#content div.acc-container #accountName {
   color: #cfd2d6;
 }
-div#content div.acc-container #acc-change, div#content div.acc-container #acc-new {
+div#content div.acc-container #acc-change, div#content div.acc-container #acc-new, div#content div.acc-container #acc-delete {
   cursor: pointer;
 }
 div#content div.acc-container #acc-change:hover {
@@ -30,6 +30,9 @@ div#content div.acc-container #acc-change:hover {
 }
 div#content div.acc-container #acc-new:hover {
   color: #28a745;
+}
+div#content div.acc-container #acc-delete:hover {
+  color: red;
 }
 
 div.subs-container-title {
@@ -91,6 +94,12 @@ div.subs-container .subs {
 }
 div.subs-container .subs .subs-top-container {
   display: flex;
+}
+div.subs-container .subs-expense {
+  background-image: linear-gradient(to right, rgba(255, 0, 0, 0) 50%, #dc3545);
+}
+div.subs-container .subs-income {
+  background-image: linear-gradient(to right, rgba(255, 0, 0, 0) 50%, rgba(0, 255, 72, 0.7));
 }
 div.subs-container .btn-hidden {
   visibility: hidden;
@@ -165,6 +174,10 @@ div.subs-container .subs:hover .btn-hidden {
   margin: 5px 0 22px 0;
   border: none;
   background: #f1f1f1;
+}
+
+.form-container b {
+  color: darkslategrey;
 }
 
 /* When the inputs get focus, do something */
