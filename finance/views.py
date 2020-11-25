@@ -95,19 +95,20 @@ def account(request):
         if amount>0: Income.objects.create(account=new_acc,amount=abs(amount),category=category)
         elif amount<0: Expense.objects.create(account=new_acc,amount=abs(amount),category=category)
         return JsonResponse({
-                    "msg": "Account (wallet) added successfully"
+                    "msg": "Account (wallet) added successfully",
+                    "id": new_acc.id
             }, status=201)
     elif request.method == "GET":
         accounts = user.accounts.all()
-        return JsonResponse([acc.name for acc in accounts], safe=False, status=200)    
+        return JsonResponse([acc.id for acc in accounts], safe=False, status=200)    
     else:
         return JsonResponse({"error": "POST or GET request required."}, status=400)
 @login_required
-def accounts_delete(request, account):
+def accounts_delete(request, account_id):
     user = request.user
     if request.method == "DELETE":
         try:
-            user_account = user.accounts.get(name=account)
+            user_account = user.accounts.get(pk=account_id)
         except:
             return JsonResponse({"error": "Account doesn't exist"}, status=400)
         user_account.delete()
@@ -117,7 +118,7 @@ def accounts_delete(request, account):
     return JsonResponse({"error": "Delete request required."}, status=400)
 
 @login_required
-def accounts(request, account):
+def accounts(request, account_id):
     user = request.user
     if request.method == "POST":
         data = json.loads(request.body)
@@ -127,7 +128,7 @@ def accounts(request, account):
             return JsonResponse({"error": "No type in request"}, status=400)
         request_type = data.get("type")
         if request_type == "income":
-            user_account = user.accounts.get(name=account)
+            user_account = user.accounts.get(pk=account_id)
             amount = Decimal(data.get("amount"))
             category_name = data.get("category","Default")
             try:
@@ -144,7 +145,7 @@ def accounts(request, account):
                     "msg": "Income added successfully"
             }, status=201)
         elif request_type == "expense":
-            user_account = user.accounts.get(name=account)
+            user_account = user.accounts.get(pk=account_id)
             amount = Decimal(data.get("amount"))
             category_name = data.get("category","Default")
             try:
@@ -161,7 +162,7 @@ def accounts(request, account):
                     "msg": "Expense added successfully"
             }, status=201)
         elif request_type == "rec_expense":
-            user_account = user.accounts.get(name=account)
+            user_account = user.accounts.get(pk=account_id)
             amount = Decimal(data.get("amount"))
             category_name = data.get("category","Default")
             description = data.get("description","No description")
@@ -188,7 +189,7 @@ def accounts(request, account):
                     "msg": "Subscription added successfully"
             }, status=201)
     elif request.method == "GET":
-        user_account = user.accounts.get(name=account)
+        user_account = user.accounts.get(pk=account_id)
         user_account.update_balance()
         balance = user_account.balance
         return JsonResponse({
@@ -198,58 +199,58 @@ def accounts(request, account):
         return JsonResponse({"error": "POST or GET request required."}, status=400)
 
 @login_required
-def all_incomes(request, account):
+def all_incomes(request, account_id):
     user = request.user
     if request.method == "GET":
         try:
-            account = user.accounts.get(name=account)
-            payments = account.incomes.order_by("-id").all()
+            account_id = user.accounts.get(pk=account_id)
+            payments = account_id.incomes.order_by("-id").all()
         except:
-            return JsonResponse({"error": f"Account: {account}. Doesn't exist"}, status=400)
+            return JsonResponse({"error": f"Account: {account_id}. Doesn't exist"}, status=400)
         return JsonResponse([payment.serialize() for payment in payments], safe=False, status=200)    
     else:
         return JsonResponse({"error": "GET request required."}, status=400) 
 
 @login_required
-def all_expenses(request, account):
+def all_expenses(request, account_id):
     user = request.user
     if request.method == "GET":
         try:
-            account = user.accounts.get(name=account)
-            payments = account.expenses.order_by("-id").all()
+            account_id = user.accounts.get(pk=account_id)
+            payments = account_id.expenses.order_by("-id").all()
         except:
-            return JsonResponse({"error": f"Account: {account}. Doesn't exist"}, status=400)
+            return JsonResponse({"error": f"Account: {account_id}. Doesn't exist"}, status=400)
         return JsonResponse([payment.serialize() for payment in payments], safe=False, status=200)    
     else:
         return JsonResponse({"error": "GET request required."}, status=400) 
 
 @login_required
-def all_rec_payments(request, account):
+def all_rec_payments(request, account_id):
     user = request.user
     if request.method == "GET":
         try:
-            account = user.accounts.get(name=account)
-            payments = account.rec_expenses.order_by("-id").exclude(end_date__lte=timezone.now()).all()
+            account_id = user.accounts.get(pk=account_id)
+            payments = account_id.rec_expenses.order_by("-id").exclude(end_date__lte=timezone.now()).all()
         except:
-            return JsonResponse({"error": f"Account: {account}. Doesn't exist"}, status=400)
+            return JsonResponse({"error": f"Account: {account_id}. Doesn't exist"}, status=400)
         return JsonResponse([payment.serialize() for payment in payments], safe=False, status=200)    
     else:
         return JsonResponse({"error": "GET request required."}, status=400)
 
 @login_required
-def all_rec_incomes(request, account):
+def all_rec_incomes(request, account_id):
     user = request.user
     if request.method == "GET":
         try:
-            account = user.accounts.get(name=account)
-            payments = account.rec_incomes.order_by("-id").exclude(end_date__lte=timezone.now()).all()
+            account_id = user.accounts.get(pk=account_id)
+            payments = account_id.rec_incomes.order_by("-id").exclude(end_date__lte=timezone.now()).all()
         except:
-            return JsonResponse({"error": f"Account: {account}. Doesn't exist"}, status=400)
+            return JsonResponse({"error": f"Account: {account_id}. Doesn't exist"}, status=400)
         return JsonResponse([payment.serialize() for payment in payments], safe=False, status=200)   
     elif request.method == "POST":
         data = json.loads(request.body)
         if not data: return JsonResponse({"error": "Empty POST request"}, status=400)
-        user_account = user.accounts.get(name=account)
+        user_account = user.accounts.get(pk=account_id)
         amount = Decimal(data.get("amount"))
         category_name = data.get("category","Default")
         description = data.get("description","No description")

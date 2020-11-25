@@ -18,7 +18,7 @@
         </div>
         <div class="acc-container">
             <span>Current wallet:</span>
-            <span id="accountName" data-account-name="{{user.accounts.all.first.name}}">{{ user.accounts.all.first.name }}</span>
+            <span id="accountName" data-account-id="{{account.id}}" data-account-name="{{account.name}}">{{ account.name }}</span>
             <span class="btn-secondary btn-sm" id="acc-new">New wallet</span>
             <span class="btn-secondary btn-sm" id="acc-change">Change wallet</span>
             <span class="btn-secondary btn-sm" id="acc-delete">Delete wallet</span>
@@ -118,7 +118,7 @@
                 </div>
                 <select class="custom-select" name="cycle" id="change_account">
                     {% for acc in user.accounts.all %}
-                    <option value="{{acc.name}}">{{acc.name}}</option>
+                    <option value="{{acc.id}}">{{acc.name}}</option>
                     {% endfor %}
                 </select>
             </div>

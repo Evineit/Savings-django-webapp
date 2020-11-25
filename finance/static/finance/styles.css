@@ -228,7 +228,7 @@ div.subs-container .subs:hover .btn-hidden {
 
   .form-container {
     width: 100vw;
-    max-width: none;
+    max-width: 640px;
   }
 }
 @media only screen and (max-width: 500px) {

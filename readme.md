@@ -13,7 +13,7 @@ Take a look at finance/urls.py there are the routes to the api but let focus and
 Notice at the bottom of index.html, the JavaScript file finance/index.js is included. Open that file, stored at finance/static/finance/index.js, and take a look. Notice that when the DOM content of the page has been loaded, we load expenses and incomes in this account adding them to the respective container then we attach event listeners to each of the buttons and the selects inputs to order the containers finally the forms onsubmit functions are set. When the add income button is clicked, for example, we call the closeForm, then calling openForm with the argument "incomes";What do these functions do? The closeForm function first closes any open form. Then openForm show the form (by setting its style.display property to none). After that, if the form is submitted the function takes all of the form input fields (where the user might type in the amount) and sets their value to the empty string '' to clear them out then it makes a post request to the API creating the income. There are other functions and request linked to the forms for handling the creation of the expenses and incomes as well as the accounts logic. The function today at the end of the javascript is to set the value of the date input for the recurring movements creation white todays date. 
 I want to talk about the ordering clint-side instead of server-side, i believe its better to request all the incomes/expenses and then ordering them in order to reduce the amount of database queries, thats why I didn't do pagination like in the las project.
 
-Now let's get back to the views.py, as we have seen the index function, we will start with the account and accounts functions, these 2 manage the creation of accounts and the the request for getting the current balance in the account from the user with the name <str:account> given as parameter. The second function uses the account model with the function update_balance that value is then returned in a Json response in order to update the balance shown in the template. The next function have a pattern all_incomes, all_expenses, all_***** these are used to get the objects associated with the account and to add new incomes and expenses, at the end this functions return (if successful) a serialized version of the new add object. After this there are functions to modify the previous mentioned objects with PUT request, if successful the return a msg.
+Now let's get back to the views.py, as we have seen the index function, we will start with the account and accounts functions, these 2 manage the creation of accounts and the the request for getting the current balance in the account from the user with the id <int:account_id> given as parameter. The second function uses the account model with the function update_balance that value is then returned in a Json response in order to update the balance shown in the template. The next function have a pattern all_incomes, all_expenses, all_***** these are used to get the objects associated with the account and to add new incomes and expenses, at the end this functions return (if successful) a serialized version of the new add object. After this there are functions to modify the previous mentioned objects with PUT request, if successful the return a msg.
 
 The last thing we are gonna look is models.py and the complementary module util.py, there are 7 models including the user, we can see how the incomes and expenses models are fairly simple, even so they have a serialize function which is used in the previously seen views.py,the more complex models are the account, the recurrent expenses and the recurrent incomes, first we'll focus in the account model. The account model has a update_balance function that takes the sum of the account expenses and incomes, this affects one of its fields but there is something tricky the function doesn't appear to be taking in account the recurrent payment and expenses, but it does.
 
@@ -29,37 +29,37 @@ GET /accounts/
 POST /accounts/
 - Add new account/wallet
 
-GET /accounts/<str:account>
+GET /accounts/<int:account_id>
 - Get Account info (Balance)
 <!-- - Responds a Json with account info like balance -->
 
-DELETE /accounts/<str:account>/delete
+DELETE /accounts/<int:account_id>/delete
 - Manage the default index account if default is deleted
 - Delete Account | Confirmation needed 
 
 <!--
-Put /accounts/<str:account>/name
+Put /accounts/<int:account_id>/name
 - Manage the default index account if default name is changed
 - Change account name
 -->
 
-POST /accounts/<str:account>
+POST /accounts/<int:account_id>
 - Add new expense, income, recurring payment
 - Receives JSON with {type, amount, extra info}
 
-GET /accounts/<str:account>/incomes
+GET /accounts/<int:account_id>/incomes
 - Get all the incomes of given account
 
-GET /accounts/<str:account>/expenses
+GET /accounts/<int:account_id>/expenses
 - Get all the expenses of given account
 
-GET /accounts/<str:account>/recpayments
+GET /accounts/<int:account_id>/recpayments
 - Get all the recurrent expenses of given account
 
-GET /accounts/<str:account>/recincomes
+GET /accounts/<int:account_id>/recincomes
 - Get all the recurrent incomes of given account
 
-POST /accounts/<str:account>/recincomes
+POST /accounts/<int:account_id>/recincomes
 - Add new recurring income.
 
 ------------------------------------------------------------------- 
@@ -119,8 +119,8 @@ It fulfills the following requirements:
 * Wallets (accounts): Users can create new wallets
     - Accounts should have independent balance e and payments
     - User should be able to change between accounts without reloading
-    <!-- FIX:  use id instead of names to avoid repeated name error-->
-    <!-- FIX:  use unique together in model to avoid repeated accounts name error-->
+    <!-- FIX:  use unique together in model to avoid repeated accounts name error
+                or show the id and the name id:name-->
 
 * Update recurring payments and incomes: Users should be able edit any of their own payments.
     - Users should be able to stop a subscription without deleting the previous payments.

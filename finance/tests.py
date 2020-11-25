@@ -24,12 +24,11 @@ class PostTestCase(TestCase):
 
     def test_server_account_name(self):
         u1 = User.objects.get(username="u1")
-        Account.objects.create(user=u1, name="123",balance=0)
+        acc =Account.objects.create(user=u1, name="123",balance=0)
         c = Client()
         logged_in = c.login(username = 'u1',password="pass1234")
         self.assertTrue(logged_in)
-        account_name = "123"
-        response = c.get('/accounts/'+account_name+'/recpayments')
+        response = c.get(f'/accounts/{acc.id}/recpayments')
         self.assertEqual(response.status_code,200)
         self.assertEqual(len(response.json()), 0)
 
@@ -42,7 +41,7 @@ class PostTestCase(TestCase):
             'amount': '15',
         }, content_type='application/json')
         self.assertEqual(response.status_code,201)
-        response = c.get('/accounts/new_wallet')
+        response = c.get(f'/accounts/{response.json().get("id")}')
         self.assertEqual(response.status_code,200)
         self.assertEqual(Decimal(response.json().get("balance")),Decimal(15))
 
@@ -175,7 +174,7 @@ class PostTestCase(TestCase):
         logged_in = c.login(username = 'u1',password="pass1234")
         self.assertTrue(logged_in)
         account = Account.objects.get()
-        response:JsonResponse = c.post('/accounts/'+account.name,content_type='application/json')
+        response:JsonResponse = c.post(f'/accounts/{account.id}',content_type='application/json')
         self.assertEqual(response.status_code, 400)
 
     def test_server_fail_recurring_incomes(self):
@@ -183,22 +182,22 @@ class PostTestCase(TestCase):
         logged_in = c.login(username = 'u1',password="pass1234")
         self.assertTrue(logged_in)
         account = Account.objects.get()
-        response:JsonResponse = c.post(f'/accounts/{account.name}/recincomes',content_type='application/json')
+        response:JsonResponse = c.post(f'/accounts/{account.id}/recincomes',content_type='application/json')
         self.assertEqual(response.status_code, 400)
 
     def test_server_recurring_payments(self):
         c = Client()
         logged_in = c.login(username = 'u1',password="pass1234")
         self.assertTrue(logged_in)
-        response = c.post('/accounts/default',data={
+        response = c.post('/accounts/1',data={
             'type': 'rec_expense',
             'amount': '15',
             'description': 'test',
             'start_date': '2020-11-01',
             'schedule_type': 'Custom'
         }, content_type='application/json')
-        response_2 = c.get('/accounts/default')
-        response_3 = c.get('/accounts/default/recpayments')
+        response_2 = c.get('/accounts/1')
+        response_3 = c.get('/accounts/1/recpayments')
         self.assertEqual(response.status_code, 201)
         self.assertLess(Decimal(response_2.json().get('balance')),0)
         self.assertEqual(response_3.status_code, 200)
@@ -207,14 +206,14 @@ class PostTestCase(TestCase):
         c = Client()
         logged_in = c.login(username = 'u1',password="pass1234")
         self.assertTrue(logged_in)
-        response = c.post('/accounts/default/recincomes',data={
+        response = c.post('/accounts/1/recincomes',data={
             'amount': '15',
             'description': 'test',
             'start_date': '2020-11-01',
             'schedule_type': 'Custom'
         }, content_type='application/json')
-        response_2 = c.get('/accounts/default')
-        response_3 = c.get('/accounts/default/recincomes')
+        response_2 = c.get('/accounts/1')
+        response_3 = c.get('/accounts/1/recincomes')
         self.assertEqual(response.status_code, 201)
         self.assertEqual(response_2.status_code, 200)
         self.assertGreaterEqual(Decimal(response_2.json().get('balance')),0)
@@ -241,12 +240,12 @@ class PostTestCase(TestCase):
             end_date = make_aware(datetime.datetime(2020,10,1)),
             schedule_type = "Monthly"
         )
-        response_payments = c.get('/accounts/default/recpayments')
+        response_payments = c.get('/accounts/1/recpayments')
         # Assert only 1 RecurringPayment is active
         self.assertEqual(response_payments.status_code, 200)
         self.assertEqual(len(response_payments.json()), 1)
         # Updates the children at the time
-        c.get('/accounts/default')
+        c.get('/accounts/1')
         self.assertGreaterEqual(rec_payment_active.children.count(),3)
         self.assertEqual(rec_payment_inactive.children.count(),2)
         rec_payment_active = RecurringPayment.objects.create(
@@ -273,14 +272,14 @@ class PostTestCase(TestCase):
         c = Client()
         logged_in = c.login(username = 'u1',password="pass1234")
         self.assertTrue(logged_in)
-        c.post('/accounts/default',data={
+        c.post('/accounts/1',data={
             'type': 'rec_expense',
             'amount': '15',
             'description': 'test',
             'start_date': '2020-11-01',
             'schedule_type': 'Custom'
         }, content_type='application/json')
-        response = c.get('/accounts/default/recpayments')
+        response = c.get('/accounts/1/recpayments')
         self.assertEqual(response.status_code, 200)
         self.assertEqual(len(response.json()), 1)
 
@@ -291,20 +290,20 @@ class PostTestCase(TestCase):
             'action': 'stop',
         }, content_type='application/json')
         self.assertEqual(stop_response.status_code, 200)
-        response = c.get('/accounts/default/recpayments')
+        response = c.get('/accounts/1/recpayments')
         self.assertEqual(len(response.json()), 0)
 
     def test_server_recurring_incomes_stop(self):
         c = Client()
         logged_in = c.login(username = 'u1',password="pass1234")
         self.assertTrue(logged_in)
-        c.post('/accounts/default/recincomes',data={
+        c.post('/accounts/1/recincomes',data={
             'amount': '15',
             'description': 'test',
             'start_date': '2020-11-01',
             'schedule_type': 'Custom'
         }, content_type='application/json')
-        response = c.get('/accounts/default/recincomes')
+        response = c.get('/accounts/1/recincomes')
         self.assertEqual(response.status_code, 200)
         self.assertEqual(len(response.json()), 1)
 
@@ -313,7 +312,7 @@ class PostTestCase(TestCase):
         self.assertEqual(rec_pay_response.status_code,200)    
         stop_response = c.put(f'/recincomes/{pay_id}/stop', content_type='application/json')
         self.assertEqual(stop_response.status_code, 200)
-        response = c.get('/accounts/default/recincomes')
+        response = c.get('/accounts/1/recincomes')
         self.assertEqual(len(response.json()), 0)
 
     def test_server_recurring_payment_next_payment_date(self):
@@ -352,14 +351,14 @@ class PostTestCase(TestCase):
         c = Client()
         logged_in = c.login(username = 'u1',password="pass1234")
         self.assertTrue(logged_in)
-        c.post('/accounts/default',data={
+        c.post('/accounts/1',data={
             'type': 'rec_expense',
             'amount': '15',
             'description': 'test',
             'start_date': '2020-11-01',
             'schedule_type': 'Custom'
         }, content_type='application/json')
-        response = c.get('/accounts/default/recpayments')
+        response = c.get('/accounts/1/recpayments')
         self.assertEqual(response.status_code, 200)
         pay_id = response.json()[0].get("id")
         change_amount_response = c.put('/recpayments/' + str(pay_id), data={
@@ -381,13 +380,13 @@ class PostTestCase(TestCase):
         c = Client()
         logged_in = c.login(username = 'u1',password="pass1234")
         self.assertTrue(logged_in)
-        add_response = c.post('/accounts/default/recincomes',data={
+        add_response = c.post('/accounts/1/recincomes',data={
             'amount': '15',
             'description': 'test',
             'start_date': '2020-11-01',
             'schedule_type': 'Custom'
         }, content_type='application/json')
-        response = c.get('/accounts/default/recincomes')
+        response = c.get('/accounts/1/recincomes')
         self.assertEqual(add_response.status_code, 201)
         self.assertEqual(response.status_code, 200)
         pay_id = response.json()[0].get("id")

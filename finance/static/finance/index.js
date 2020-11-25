@@ -1,5 +1,5 @@
 document.addEventListener('DOMContentLoaded', function() {
-    starting_acc = document.getElementById('accountName').innerHTML
+    starting_acc = document.getElementById('accountName').dataset.accountId
     reload_subs(starting_acc)
     set_buttons()
     set_listeners()
@@ -18,7 +18,7 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 function set_listeners(){
-    let account_name = document.querySelector('#accountName').dataset.accountName;
+    let account_name = document.querySelector('#accountName').dataset.accountId;
 
     document.querySelector('#changeAccForm>form').onsubmit = function() {
         const new_account = document.getElementById("change_account").value
@@ -27,8 +27,8 @@ function set_listeners(){
             return false
         } 
         const current_name = document.querySelector('#accountName')
-        current_name.innerHTML = new_account
-        current_name.dataset.accountName = new_account
+        current_name.innerHTML = document.getElementById("change_account").selectedOptions[0].innerHTML
+        current_name.dataset.accountId = new_account
         set_listeners()
         reload_balance(new_account)
         reload_subs(new_account)
@@ -46,6 +46,7 @@ function set_listeners(){
         .then( response =>{
             if (response.ok){
                 document.querySelector(`#change_account>option[value="${account_name}"]`)
+                // TODO: delete from change account happening?
                 let csrftoken = getCookie('csrftoken');
                 fetch('/accounts',{
                     method: 'GET',
@@ -59,7 +60,7 @@ function set_listeners(){
                             const new_account = result[0]
                             const current_name = document.querySelector('#accountName')
                             current_name.innerHTML = new_account
-                            current_name.dataset.accountName = new_account
+                            current_name.dataset.accountId = new_account
                             set_listeners()
                             reload_balance(new_account)
                             reload_subs(new_account)
