@@ -45,8 +45,7 @@ function set_listeners(){
         })
         .then( response =>{
             if (response.ok){
-                document.querySelector(`#change_account>option[value="${account_name}"]`)
-                // TODO: delete from change account happening?
+                document.querySelector(`#change_account>option[value="${account_name}"]`).remove()
                 let csrftoken = getCookie('csrftoken');
                 fetch('/accounts',{
                     method: 'GET',
