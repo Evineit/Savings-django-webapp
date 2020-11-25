@@ -3,6 +3,8 @@ document.addEventListener('DOMContentLoaded', function() {
     reload_subs(starting_acc)
     set_buttons()
     set_listeners()
+    // This are only called at the start because the targets won't change like the rest
+    // in set_listeners()
     document.getElementById("rec_exp_order").addEventListener('change',(e) =>{
         order_rec_container_by(document.getElementById("rec_expenses_container"),document.getElementById("rec_exp_order").value)
     })
@@ -112,7 +114,6 @@ function set_listeners(){
     document.querySelector('#incomesForm>form').onsubmit = function() {
         const amount = document.querySelector('#incomesForm>form>input').value;
         document.querySelector('#incomesForm>form>input').value = null;
-        // Send a POST request to the URL
         let csrftoken = getCookie('csrftoken');
         fetch('/accounts/'+account_name, {
                 method: 'POST',
@@ -126,7 +127,6 @@ function set_listeners(){
                 credentials: "include"
             })
             .then(response => {
-                // response.json()
                 if (response.status == 201){
                     response.json().then(result =>{
                         new_sub = create_basic_mov(result.sub)
@@ -378,6 +378,7 @@ function reload_subs(account_name) {
 }
 
 function create_sub(payment){
+    // TODO: Improve sub title display
     const element = document.createElement('div')
     const top_div = document.createElement('div')
     const bot_div = document.createElement('div')
