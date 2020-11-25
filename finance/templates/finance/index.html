@@ -7,20 +7,21 @@
     {% if user.is_authenticated %}
     <div id="content">
         <span>Balance: <h2 id="balance">{{ account.balance }}$</h2></span>
-        <button name="income" data-account-id="{{account.id}}" class="btn btn-outline-success">Add Income</button>
+        <div>
+            <button name="income" data-account-id="{{account.id}}" class="btn btn-outline-success">Add Income</button>
         <button name="recincome" data-account-id="{{account.id}}" class="btn btn-outline-success">Add Recurrent
             Income</button>
         <!-- <br> -->
         <button name="expense" data-account-id="{{account.id}}" class="btn btn-outline-danger">Add Expense</button>
         <button name="recexpense" data-account-id="{{account.id}}" class="btn btn-outline-danger">Add
             Subscription</button>
+        </div>
         <div class="acc-container">
-            <br>
             <span>Current wallet:</span>
             <span id="accountName" data-account-name="{{user.accounts.all.first.name}}">{{ user.accounts.all.first.name }}</span>
-            <span id="acc-new">New wallet</span>
-            <span id="acc-change">Change wallet</span>
-            <span id="acc-delete">Delete wallet</span>
+            <span class="btn-secondary btn-sm" id="acc-new">New wallet</span>
+            <span class="btn-secondary btn-sm" id="acc-change">Change wallet</span>
+            <span class="btn-secondary btn-sm" id="acc-delete">Delete wallet</span>
         </div>
     </div>
     <div class="form-popup" id="incomesForm">
@@ -147,8 +148,8 @@
     <!-- <br> -->
     <div>
         <div class="subs-container-title">
-            <h3>Active Subscriptions</h3>
-            <span class="sub-order">order by:</span>
+            <h3>Subscriptions</h3>
+            <span class="sub-order sub-order-text">order by:</span>
             <span class="sub-order">
                 <select class="sub-order-select" name="rec_exp_order" id="rec_exp_order">
                     <option selected value="nex_pay_asc">Next payment date (asc)</option>
@@ -165,8 +166,8 @@
     </div>
     <div>
         <div class="subs-container-title">
-            <h3>Active Recurrent Incomes</h3>
-            <span class="sub-order">order by:</span>
+            <h3>Recurrent Incomes</h3>
+            <span class="sub-order sub-order-text">order by:</span>
             <span class="sub-order">
                 <select class="sub-order-select" name="rec_inc_order" id="rec_inc_order">
                     <option selected value="nex_pay_asc">Next payment date (asc)</option>
@@ -184,7 +185,7 @@
     <div>
         <div class="subs-container-title">
             <h3>Incomes</h3>
-                <span class="sub-order">order by:</span>
+                <span class="sub-order sub-order-text">order by:</span>
                 <span class="sub-order">
                     <select class="sub-order-select" name="inc_order" id="inc_order">
                         <option selected value="date_dsc">Added date (dsc)</option>
@@ -200,7 +201,7 @@
     <div>
         <div class="subs-container-title">
             <h3>Expenses</h3>
-                    <span class="sub-order">order by:</span>
+                    <span class="sub-order sub-order-text">order by:</span>
                     <span class="sub-order">
                         <select class="sub-order-select" name="exp_order" id="exp_order">
                             <option selected value="date_dsc">Added date (dsc)</option>

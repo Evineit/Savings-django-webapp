@@ -404,7 +404,7 @@ function create_sub(payment){
         change_amount(payment.id, amount)
     })
 
-    title.innerHTML = `id: ${payment.id}, ${payment.description}, Schedule:${payment.schedule_type}
+    title.innerHTML = `${payment.description}, Schedule:${payment.schedule_type}
     , Next payment date: ${payment.next_date}`;
     amount.innerHTML = `Amount:${payment.amount}$`
     top_div.append(title)
@@ -428,7 +428,7 @@ function create_basic_mov(payment){
     element.dataset.amount = payment.amount
     element.dataset.next_date = payment.timestamp
     title.style = "flex: 1;"
-    title.innerHTML = `id: ${payment.id}, Added date: ${payment.added_date}`;
+    title.innerHTML = `Added date: ${payment.added_date}`;
     amount.innerHTML = `Amount:${payment.amount}$`
     top_div.append(title)
     top_div.append(amount)
@@ -472,7 +472,7 @@ function create_rec_income(payment){
         change_recincomes_amount(payment.id, amount)
     })
 
-    title.innerHTML = `id: ${payment.id}, ${payment.description}, Schedule:${payment.schedule_type}
+    title.innerHTML = `${payment.description}, Schedule:${payment.schedule_type}
     , Next payment date: ${payment.next_date}`;
     amount.innerHTML = `Amount:${payment.amount}$`
     top_div.append(title)

@@ -6,8 +6,8 @@ body {
   margin: 5px;
   font-family: "roboto", sans-serif;
   font-weight: 700;
-
-  
+  max-width: 1440px;
+    margin: auto;
 }
 
 div#content {
@@ -16,9 +16,11 @@ div#content {
     margin: 0px 0px 5px 0px;
   }
   div.acc-container{
-    display: inline;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
     span {
-      margin: 0px 5px;
+      margin: 5px 5px;
       // cursor: pointer;
     }
     #accountName{
@@ -41,6 +43,8 @@ div#content {
 div.subs-container-title{
   h3{
     flex:1;
+    margin: auto;
+    padding-left: 5px;
   }
   display: flex;
   .title{
@@ -155,11 +159,6 @@ div.subs-container {
   left: 50%;
   transform: translate(-50%);
   display: none;
-  // position: fixed;
-  // bottom: 0;
-  // right: 15px;
-  // border: 3px solid #f1f1f1;
-  // z-index: 9;
   outline: none;
   position: fixed;
   box-sizing: border-box;
@@ -170,6 +169,7 @@ div.subs-container {
     color: #202020;
   }
 }
+
 /* Add styles to the form container */
 .form-container {
   min-width: 30vw;
@@ -237,7 +237,20 @@ div.subs-container {
 //     transform: translate(-50%,-50%);
 //   }
 // }
-@media only screen and (max-height: 600px) {
+@media only screen and (max-height: 735px) {
+  .form-popup {
+    position: absolute;
+    left: 50%;
+  top: 50%;
+  transform: translate(-50%,-50%);
+  }
+  .form-container{
+    width: 100vw;
+    max-width: none;
+  }
+
+}
+@media only screen and (max-width: 500px) {
   .form-popup {
     position: relative;
     left: 50%;
@@ -248,7 +261,46 @@ div.subs-container {
     width: 100vw;
     max-width: none;
   }
+  .sub-order-text{
+    display: none;
+  }
 
+}
+@media only screen and (max-width: 768px){
+  div.subs-container {
+    .btn-hidden{
+      visibility: visible;
+    }
+    .btn{
+      padding: .25rem .5rem;
+      font-size: .875rem;
+      line-height: 1.5;
+      border-radius: .2rem;
+    }
+    .subs{
+      padding: 5px;
+    }
+    h6{
+      font-size: 0.8rem;
+    }
+  }
+
+}
+.navbar{
+  -ms-flex-flow: row nowrap;
+    flex-flow: row nowrap;
+    -ms-flex-pack: start;
+    justify-content: flex-start;
+    padding-right: .5rem;
+    padding-left: .5rem;
+}
+.navbar-nav {
+  flex-direction: row;
+  li {
+    padding-right: .5rem;
+      padding-left: .5rem;
+
+    }
 }
 .center-full {
   position: absolute;

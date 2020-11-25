@@ -5,6 +5,8 @@ body {
   margin: 5px;
   font-family: "roboto", sans-serif;
   font-weight: 700;
+  max-width: 1440px;
+  margin: auto;
 }
 
 div#content {
@@ -14,10 +16,12 @@ div#content button {
   margin: 0px 0px 5px 0px;
 }
 div#content div.acc-container {
-  display: inline;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
 }
 div#content div.acc-container span {
-  margin: 0px 5px;
+  margin: 5px 5px;
 }
 div#content div.acc-container #accountName {
   color: #cfd2d6;
@@ -40,6 +44,8 @@ div.subs-container-title {
 }
 div.subs-container-title h3 {
   flex: 1;
+  margin: auto;
+  padding-left: 5px;
 }
 div.subs-container-title .title {
   font-size: 1.75rem;
@@ -212,7 +218,20 @@ div.subs-container .subs:hover .btn-hidden {
   opacity: 1;
 }
 
-@media only screen and (max-height: 600px) {
+@media only screen and (max-height: 735px) {
+  .form-popup {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+  }
+
+  .form-container {
+    width: 100vw;
+    max-width: none;
+  }
+}
+@media only screen and (max-width: 500px) {
   .form-popup {
     position: relative;
     left: 50%;
@@ -224,7 +243,45 @@ div.subs-container .subs:hover .btn-hidden {
     width: 100vw;
     max-width: none;
   }
+
+  .sub-order-text {
+    display: none;
+  }
 }
+@media only screen and (max-width: 768px) {
+  div.subs-container .btn-hidden {
+    visibility: visible;
+  }
+  div.subs-container .btn {
+    padding: 0.25rem 0.5rem;
+    font-size: 0.875rem;
+    line-height: 1.5;
+    border-radius: 0.2rem;
+  }
+  div.subs-container .subs {
+    padding: 5px;
+  }
+  div.subs-container h6 {
+    font-size: 0.8rem;
+  }
+}
+.navbar {
+  -ms-flex-flow: row nowrap;
+  flex-flow: row nowrap;
+  -ms-flex-pack: start;
+  justify-content: flex-start;
+  padding-right: 0.5rem;
+  padding-left: 0.5rem;
+}
+
+.navbar-nav {
+  flex-direction: row;
+}
+.navbar-nav li {
+  padding-right: 0.5rem;
+  padding-left: 0.5rem;
+}
+
 .center-full {
   position: absolute;
   top: 50%;
