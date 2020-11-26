@@ -97,9 +97,29 @@ div.subs-container .subs {
   animation-play-state: paused;
   display: flex;
   flex-direction: column;
+  border-radius: 5px;
 }
 div.subs-container .subs .subs-top-container {
+  margin: auto 0px;
   display: flex;
+}
+div.subs-container .subs .subs-top-container .subs-top-info {
+  margin: auto;
+  margin-inline: 5px;
+  border-radius: 15px;
+}
+div.subs-container .subs .subs-top-container h6 {
+  margin: auto;
+}
+div.subs-container .subs .subs-bot-container {
+  display: flex;
+  margin: auto 0px;
+}
+div.subs-container .subs .subs-bot-container .subs-amount {
+  flex: 1 1;
+  margin: auto;
+  text-align: right;
+  font-weight: 700;
 }
 div.subs-container .subs-expense {
   background-image: linear-gradient(to right, rgba(255, 0, 0, 0) 50%, #dc3545);

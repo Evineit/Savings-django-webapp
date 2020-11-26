@@ -386,8 +386,14 @@ function create_sub(payment){
     const amount = document.createElement('h6')
     const stop_button = document.createElement('button')
     const amount_button = document.createElement('button')
+    const schedule_type = document.createElement('h6')
+    const next_date = document.createElement('h6')
+    schedule_type.className = "btn-secondary subs-top-info btn-sm"
+    next_date.className =     "btn-secondary subs-top-info btn-sm"
     element.className = "subs subs-expense"
     top_div.className = "subs-top-container"
+    bot_div.className = "subs-bot-container"
+    amount.className = "subs-amount"
     element.dataset.id = payment.id
     element.dataset.title = payment.description
     element.dataset.amount = payment.amount
@@ -405,13 +411,16 @@ function create_sub(payment){
         change_amount(payment.id, amount)
     })
 
-    title.innerHTML = `${payment.description}, Schedule:${payment.schedule_type}
-    , Next payment date: ${payment.next_date}`;
-    amount.innerHTML = `Amount:${payment.amount}$`
+    title.innerHTML = `${payment.description}`;
+    schedule_type.innerHTML = `Schedule:${payment.schedule_type}`
+    next_date.innerHTML = `Next payment date: ${payment.next_date}`
+    amount.innerHTML = `Amount:${payment.amount}`
     top_div.append(title)
-    top_div.append(amount)
+    top_div.append(schedule_type)
+    top_div.append(next_date)
     bot_div.append(amount_button)  
     bot_div.append(stop_button)  
+    bot_div.append(amount)
     element.append(top_div)
     element.append(bot_div)
 
@@ -425,6 +434,8 @@ function create_basic_mov(payment){
     const amount = document.createElement('h6')
     element.className = "subs"
     top_div.className = "subs-top-container"
+    element.style.animation ="none"
+    element.style.height = "60px"
     element.dataset.id = payment.id
     element.dataset.amount = payment.amount
     element.dataset.next_date = payment.timestamp
@@ -445,8 +456,14 @@ function create_rec_income(payment){
     const amount = document.createElement('h6')
     const stop_button = document.createElement('button')
     const amount_button = document.createElement('button')
+    const schedule_type = document.createElement('h6')
+    const next_date = document.createElement('h6')
+    schedule_type.className = "btn-secondary subs-top-info btn-sm"
+    next_date.className =     "btn-secondary subs-top-info btn-sm"
     element.className = "subs subs-income"
     top_div.className = "subs-top-container"
+    bot_div.className = "subs-bot-container"
+    amount.className = "subs-amount"
     element.dataset.id = payment.id
     element.dataset.title = payment.description
     element.dataset.amount = payment.amount
@@ -473,13 +490,16 @@ function create_rec_income(payment){
         change_recincomes_amount(payment.id, amount)
     })
 
-    title.innerHTML = `${payment.description}, Schedule:${payment.schedule_type}
-    , Next payment date: ${payment.next_date}`;
-    amount.innerHTML = `Amount:${payment.amount}$`
+    title.innerHTML = `${payment.description}`;
+    schedule_type.innerHTML = `Schedule:${payment.schedule_type}`
+    next_date.innerHTML = `Next income date: ${payment.next_date}`
+    amount.innerHTML = `Amount:${payment.amount}`
     top_div.append(title)
-    top_div.append(amount)
+    top_div.append(schedule_type)
+    top_div.append(next_date)
     bot_div.append(amount_button)  
     bot_div.append(stop_button)  
+    bot_div.append(amount)
     element.append(top_div)
     element.append(bot_div)
 
