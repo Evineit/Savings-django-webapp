@@ -100,7 +100,7 @@ def account(request):
             }, status=201)
     elif request.method == "GET":
         accounts = user.accounts.all()
-        return JsonResponse([acc.id for acc in accounts], safe=False, status=200)    
+        return JsonResponse([acc.serialize() for acc in accounts], safe=False, status=200)    
     else:
         return JsonResponse({"error": "POST or GET request required."}, status=400)
 @login_required

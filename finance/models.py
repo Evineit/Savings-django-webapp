@@ -29,6 +29,12 @@ class Account(models.Model):
         expenses = sum([x.amount for x in Expense.objects.filter(account = self)])
         self.balance = incomes - expenses
         self.save()
+    def serialize(self):
+        return {
+            "id": self.id,
+            "name": self.name,
+            "balance": self.balance
+        }
 
 class Income(models.Model):
     account = models.ForeignKey("Account", on_delete=models.CASCADE, related_name="incomes")

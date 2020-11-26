@@ -60,11 +60,11 @@ function set_listeners(){
                         response.json().then(result=>{
                             const new_account = result[0]
                             const current_name = document.querySelector('#accountName')
-                            current_name.innerHTML = new_account
-                            current_name.dataset.accountId = new_account
+                            current_name.innerHTML = new_account.name
+                            current_name.dataset.accountId = new_account.id
                             set_listeners()
-                            reload_balance(new_account)
-                            reload_subs(new_account)
+                            reload_balance(new_account.id)
+                            reload_subs(new_account.id)
                             closeForm()
                         })
                     }
@@ -97,10 +97,12 @@ function set_listeners(){
         })
         .then(response =>{
             if (response.ok){
-                new_account = document.createElement('option') 
-                new_account.value = title
-                new_account.innerHTML = title
-                document.getElementById("change_account").append(new_account) 
+                response.json().then(result=>{
+                    new_account = document.createElement('option') 
+                    new_account.value = result.id
+                    new_account.innerHTML = title
+                    document.getElementById("change_account").append(new_account) 
+                })                
             }
             document.querySelector('#newAccForm>form>input[name="title"]').value = null;
             document.querySelector('#newAccForm>form>input[name="amount"]').value = null;
