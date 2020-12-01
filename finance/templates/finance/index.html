@@ -29,18 +29,18 @@
         <form class="form-container rounded">
             <h1>Add income</h1>
             <label for="amount"><b>Amount</b></label>
-            <input type="number" min=1 placeholder="Enter Amount $" name="amount" required>
-            <button type="submit" class="btn">Done</button>
-            <button type="button" class="btn cancel" onclick="closeForm()">Close</button>
+            <input type="number" step="any" min=1 placeholder="Enter Amount $" name="amount" required>
+            <button type="submit" class="btn btn-success btn-lg btn-block">Done</button>
+            <button type="button" class="btn btn-danger btn-lg btn-block" onclick="closeForm()">Close</button>
         </form>
     </div>
     <div class="form-popup" id="expensesForm">
         <form class="form-container rounded">
             <h1>Add expense</h1>
             <label for="amount"><b>Amount</b></label>
-            <input type="number" min=1 placeholder="Enter Amount $" name="amount" required>
-            <button type="submit" class="btn">Done</button>
-            <button type="button" class="btn cancel" onclick="closeForm()">Close</button>
+            <input type="number" step="any" min=1 placeholder="Enter Amount $" name="amount" required>
+            <button type="submit" class="btn btn-success btn-lg btn-block">Done</button>
+            <button type="button" class="btn btn-danger btn-lg btn-block" onclick="closeForm()">Close</button>
         </form>
     </div>
     <div class="form-popup" id="recexpensesForm">
@@ -49,14 +49,12 @@
             <label for="title"><b>Title</b></label>
             <input type="text" placeholder="Enter title" name="title" required>
             <label for="amount"><b>Amount</b></label>
-            <input type="number" min=1 placeholder="Enter Amount $" name="amount" required>
+            <input type="number" step="any" min=1 placeholder="Enter Amount $" name="amount" required>
             <div class="input-group mb-3">
                 <div class="input-group-prepend">
-                    <label class="input-group-text" for="inputGroupSelect01">Repeat</label>
+                    <label class="input-group-text" for="schedule_type">Repeat</label>
                 </div>
                 <select class="custom-select" name="cycle" id="schedule_type">
-                    <!-- Custom option for testing purposes -->
-                    <!-- <option value="Custom">(Debug) Daily</option> -->
                     <option value="Monthly">Monthly</option>
                     <option value="Yearly">Yearly</option>
                 </select>
@@ -65,11 +63,11 @@
                 <div class="input-group-prepend">
                     <label class="input-group-text" for="start">Start date:</label>
                 </div>
-                <input class="custom-select" type="date" id="start" name="trip-start" value="2018-07-22"
+                <input class="custom-select" type="date" id="start" value="2020-11-20"
                     min="2018-01-01">
             </div>
-            <button type="submit" class="btn">Done</button>
-            <button type="button" class="btn cancel" onclick="closeForm()">Close</button>
+            <button type="submit" class="btn btn-success btn-lg btn-block">Done</button>
+            <button type="button" class="btn btn-danger btn-lg btn-block" onclick="closeForm()">Close</button>
         </form>
     </div>
     <div class="form-popup" id="recIncomesForm">
@@ -78,14 +76,12 @@
             <label for="title"><b>Title</b></label>
             <input type="text" placeholder="Enter title" name="title" required>
             <label for="amount"><b>Amount</b></label>
-            <input type="number" min=1 placeholder="Enter Amount $" name="amount" required>
+            <input type="number" step="any" min=1 placeholder="Enter Amount $" name="amount" required>
             <div class="input-group mb-3">
                 <div class="input-group-prepend">
-                    <label class="input-group-text" for="inputGroupSelect01">Repeat</label>
+                    <label class="input-group-text" for="income_schedule_type">Repeat</label>
                 </div>
                 <select class="custom-select" name="cycle" id="income_schedule_type">
-                    <!-- Custom option for testing purposes -->
-                    <!-- <option value="Custom">(Debug) Daily</option> -->
                     <option value="Monthly">Monthly</option>
                     <option value="Yearly">Yearly</option>
                 </select>
@@ -94,20 +90,20 @@
                 <div class="input-group-prepend">
                     <label class="input-group-text" for="start">Start date:</label>
                 </div>
-                <input class="custom-select" type="date" id="income_start" name="trip-start" value="2018-07-22"
+                <input class="custom-select" type="date" id="income_start" value="2020-11-20"
                     min="2018-01-01">
             </div>
-            <button type="submit" class="btn">Done</button>
-            <button type="button" class="btn cancel" onclick="closeForm()">Close</button>
+            <button type="submit" class="btn btn-success btn-lg btn-block">Done</button>
+            <button type="button" class="btn btn-danger btn-lg btn-block" onclick="closeForm()">Close</button>
         </form>
     </div>
     <div class="form-popup" id="amount_form">
         <form class="form-container rounded">
             <h4>Change amount</h1>
                 <label for="amount"><b>Amount</b></label>
-                <input type="number" min=1 placeholder="Enter Amount $" name="amount" required>
-                <button type="submit" class="btn">Done</button>
-                <button type="button" class="btn cancel" onclick="closeForm()">Close</button>
+                <input type="number" step="any" min=1 placeholder="Enter Amount $" name="amount" required>
+                <button type="submit" class="btn btn-success btn-lg btn-block">Done</button>
+                <button type="button" class="btn btn-danger btn-lg btn-block" onclick="closeForm()">Close</button>
         </form>
     </div>
     <div class="form-popup" id="changeAccForm">
@@ -115,7 +111,7 @@
             <h1>Change account</h1>
             <div class="input-group mb-3">
                 <div class="input-group-prepend">
-                    <label class="input-group-text" for="inputGroupSelect01">Account</label>
+                    <label class="input-group-text" for="change_account">Account</label>
                 </div>
                 <select class="custom-select" name="cycle" id="change_account">
                     {% for acc in user.accounts.all %}
@@ -123,16 +119,16 @@
                     {% endfor %}
                 </select>
             </div>
-            <button type="submit" class="btn">Done</button>
-            <button type="button" class="btn cancel" onclick="closeForm()">Close</button>
+            <button type="submit" class="btn btn-success btn-lg btn-block">Done</button>
+            <button type="button" class="btn btn-danger btn-lg btn-block" onclick="closeForm()">Close</button>
         </form>
     </div>
     <div id="delete_accForm" class="form-popup">
         <form class="form-container rounded">
             <h1>Delete current account</h1>
             <b>Are you sure you want to delete the current account?</b>
-            <button type="submit" class="btn">Confirm</button>
-            <button type="button" class="btn cancel" onclick="closeForm()">Close</button>
+            <button type="submit" class="btn btn-success btn-lg btn-block">Confirm</button>
+            <button type="button" class="btn btn-danger btn-lg btn-block" onclick="closeForm()">Close</button>
         </form>
     </div>
     <div class="form-popup" id="newAccForm">
@@ -142,8 +138,8 @@
             <input type="text" placeholder="Enter title" name="title" required>
             <label for="amount"><b>Starting amount</b></label>
             <input type="number" step="any" placeholder="Enter Amount $" name="amount" required>
-            <button type="submit" class="btn">Done</button>
-            <button type="button" class="btn cancel" onclick="closeForm()">Close</button>
+            <button type="submit" class="btn btn-success btn-lg btn-block">Done</button>
+            <button type="button" class="btn btn-danger btn-lg btn-block" onclick="closeForm()">Close</button>
         </form>
     </div>
 

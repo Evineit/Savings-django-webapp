@@ -11,11 +11,6 @@ class User(AbstractUser):
         for account in self.accounts.all():
             account.delete()
 
-class Category(models.Model):
-    name = models.CharField(max_length=50)
-    def __str__(self):
-        return f"{self.name}"
-
 class Account(models.Model):
     user = models.ForeignKey("User", on_delete=models.CASCADE, related_name="accounts")
     balance = models.DecimalField(decimal_places=3,max_digits=10)
@@ -40,7 +35,6 @@ class Income(models.Model):
     account = models.ForeignKey("Account", on_delete=models.CASCADE, related_name="incomes")
     amount = models.DecimalField(decimal_places=3,max_digits=10)
     added_date = models.DateTimeField(default=timezone.now)
-    category = models.ForeignKey(Category, on_delete=models.CASCADE, related_name="incomes")
     recurring_parent = models.ForeignKey("RecurringIncome", on_delete=models.CASCADE, related_name="children", null=True, blank=True)
     def __str__(self):
         return f"id: {self.id},account:{self.account.name},amount: {self.amount}, date:{self.added_date}"
@@ -48,7 +42,6 @@ class Income(models.Model):
         return {
             "id": self.id,
             "amount": self.amount,
-            "category": self.category.name,
             "added_date": self.added_date.strftime("%b %-d %Y, %-I:%M %p"),
             "timestamp": self.added_date.timestamp(),
             "parent_id": self.recurring_parent.id if self.recurring_parent else None,
@@ -59,7 +52,6 @@ class Expense(models.Model):
     account = models.ForeignKey("Account", on_delete=models.CASCADE, related_name="expenses")
     amount = models.DecimalField(decimal_places=3,max_digits=10)
     added_date = models.DateTimeField(default=timezone.now)
-    category = models.ForeignKey(Category, on_delete=models.CASCADE,related_name="expenses")
     recurring_parent = models.ForeignKey("RecurringPayment", on_delete=models.CASCADE, related_name="children", null=True, blank=True)
     def __str__(self):
         return f"id: {self.id},amount: {self.amount}, date:{self.added_date}"
@@ -67,7 +59,6 @@ class Expense(models.Model):
         return {
             "id": self.id,
             "amount": self.amount,
-            "category": self.category.name,
             "added_date": self.added_date.strftime("%b %-d %Y, %-I:%M %p"),
             "timestamp": self.added_date.timestamp(),
             "parent_id": self.recurring_parent.id if self.recurring_parent else None,
@@ -83,14 +74,12 @@ class RecurringPayment(models.Model):
     start_date = models.DateTimeField()
     end_date = models.DateTimeField(blank=True, null=True)
     schedule_type = models.CharField(max_length=50)
-    category = models.ForeignKey(Category, on_delete=models.CASCADE, related_name="recpayments")
 
     def serialize(self):
         return {
             "id": self.id,
             "description": self.description,
             "amount": self.amount,
-            "category": self.category.name,
             "start_date": self.start_date.strftime("%b %-d %Y, %-I:%M %p"),
             "next_date": self.next_payment_date().strftime(r"%d %b %Y") ,
             "next_date_timestamp": self.next_payment_date().timestamp() ,
@@ -114,14 +103,12 @@ class RecurringIncome(models.Model):
     start_date = models.DateTimeField()
     end_date = models.DateTimeField(blank=True, null=True)
     schedule_type = models.CharField(max_length=50)
-    category = models.ForeignKey(Category, on_delete=models.CASCADE, related_name="recincomes")
 
     def serialize(self):
         return {
             "id": self.id,
             "description": self.description,
             "amount": self.amount,
-            "category": self.category.name,
             "start_date": self.start_date.strftime("%b %-d %Y, %-I:%M %p"),
             "next_date": self.next_payment_date().strftime(r"%d %b %Y") ,
             "next_date_timestamp": self.next_payment_date().timestamp() ,

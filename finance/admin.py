@@ -4,7 +4,6 @@ from .models import *
 # Register your models here.
 admin.site.register(User)
 admin.site.register(Account)
-admin.site.register(Category)
 admin.site.register(Income)
 admin.site.register(Expense)
 admin.site.register(RecurringIncome)

@@ -33,7 +33,6 @@ def update_children(recurringObject,childClass,date = timezone.now()):
                     account= recurringObject.account,
                     amount = recurringObject.amount,
                     added_date = make_aware(datetime.datetime.combine(new_date, datetime.datetime.min.time())),
-                    category = recurringObject.category,
                     recurring_parent = recurringObject
             ) 
             children_count = recurringObject.children.all().count()
