@@ -5,5 +5,6 @@
         "recexpenses",
         "recincomes",
         "recpayments"
-    ]
+    ],
+    "python.pythonPath": "C:\\Users\\kevin\\AppData\\Local\\Programs\\Python\\Python38-32\\python.exe"
 }
