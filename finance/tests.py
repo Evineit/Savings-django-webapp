@@ -5,7 +5,6 @@ from django.http.response import JsonResponse
 from django.test import TestCase, Client
 from django.core.paginator import Paginator
 from .models import *
-from selenium import webdriver
 import datetime
 from django.utils.timezone import make_aware
 
