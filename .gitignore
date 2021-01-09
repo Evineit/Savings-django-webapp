@@ -1,0 +1,7 @@
+.idea/.gitignore
+.idea
+/.vscode/
+.env*
+!.env.example
+*.pyc
+db.sqlite3
