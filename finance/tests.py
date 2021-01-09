@@ -1,14 +1,13 @@
-from datetime import time
+import datetime
 from decimal import Decimal
-import json
+
 from django.http.response import JsonResponse
 from django.test import TestCase, Client
-from django.core.paginator import Paginator
-from .models import User, Account, Income, Expense, RecurringIncome, RecurringPayment
-from .util import add_months
-import datetime
-from django.utils.timezone import make_aware
 from django.utils import timezone
+from django.utils.timezone import make_aware
+
+from .models import User, Account, Expense, RecurringIncome, RecurringPayment
+from .util import add_months
 
 
 # Create your tests here.
@@ -21,7 +20,7 @@ class PostTestCase(TestCase):
         # u3 = User.objects.create_user(username="u3", email="u3@seidai.com", password="pass1234")
 
         # Create posts.
-        acc = Account.objects.create(user=u1, name="default", balance=0)
+        Account.objects.create(user=u1, name="default", balance=0)
 
     def test_server_account_name(self):
         u1 = User.objects.get(username="u1")

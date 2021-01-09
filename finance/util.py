@@ -1,8 +1,6 @@
-import datetime
-from datetime import date, time
-from django.contrib.auth.models import AbstractUser
-from django.db import models
 import calendar
+import datetime
+
 from django.utils import timezone
 from django.utils.timezone import make_aware
 
@@ -24,7 +22,7 @@ def update_children(recurringObject, childClass, date=timezone.now()):
     children_count = recurringObject.children.all().count()
     new_date = recurringObject.start_date
 
-    while (children_count <= cycles):
+    while children_count <= cycles:
         if recurringObject.schedule_type == "Custom":
             new_date = recurringObject.start_date + datetime.timedelta(days=children_count)
         elif recurringObject.schedule_type == "Monthly":
@@ -41,7 +39,8 @@ def update_children(recurringObject, childClass, date=timezone.now()):
 
 
 def cycles_at_date(recurringObject, date: datetime = timezone.now()) -> int:
-    if timezone.is_naive(date): date = make_aware(date)
+    if timezone.is_naive(date):
+        date = make_aware(date)
     if recurringObject.schedule_type == "Custom":
         if recurringObject.end_date and date > recurringObject.end_date:
             delta = recurringObject.end_date - recurringObject.start_date
