@@ -8,7 +8,7 @@ from django.db import IntegrityError
 
 from decimal import Decimal
 from django.core.paginator import Paginator
-from django.utils.timezone import activate
+from django.utils.timezone import make_aware, now
 from .models import User, Account, Income, Expense, RecurringIncome, RecurringPayment
 from datetime import datetime
 
@@ -193,7 +193,7 @@ def all_rec_payments(request, account_id):
     if request.method == "GET":
         try:
             account_id = user.accounts.get(pk=account_id)
-            payments = account_id.rec_expenses.order_by("-id").exclude(end_date__lte=timezone.now()).all()
+            payments = account_id.rec_expenses.order_by("-id").exclude(end_date__lte=now()).all()
         except:
             return JsonResponse({"error": f"Account: {account_id}. Doesn't exist"}, status=400)
         if request.GET.get('page'):
@@ -234,7 +234,7 @@ def all_rec_incomes(request, account_id):
     if request.method == "GET":
         try:
             account_id = user.accounts.get(pk=account_id)
-            payments = account_id.rec_incomes.order_by("-id").exclude(end_date__lte=timezone.now()).all()
+            payments = account_id.rec_incomes.order_by("-id").exclude(end_date__lte=now()).all()
         except:
             return JsonResponse({"error": f"Account: {account_id}. Doesn't exist"}, status=400)
         if request.GET.get('page'):
@@ -333,7 +333,7 @@ def rec_payment_stop(request,id):
     except:
             return JsonResponse({"error": f"Payment with id: {id}. Doesn't exist"}, status=400) 
     if request.method == "PUT":
-        payment.end_date = timezone.now()
+        payment.end_date = now()
         payment.save()
         return JsonResponse({"msg": f"Payment with id: {id}. Has been stopped"}, status=200)
     else:
@@ -350,7 +350,7 @@ def rec_income_stop(request,id):
     except:
             return JsonResponse({"error": f"Payment with id: {id}. Doesn't exist"}, status=400) 
     if request.method == "PUT":
-        payment.end_date = timezone.now()
+        payment.end_date = now()
         payment.save()
         return JsonResponse({"msg": f"Payment with id: {id}. Has been stopped"}, status=200)
     else:

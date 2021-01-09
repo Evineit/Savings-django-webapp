@@ -3,7 +3,7 @@ from django.contrib.auth.models import AbstractUser
 from django.db import models
 from django.utils import timezone
 
-from .util import *
+from .util import next_payment_date, update_children, cycles_at_date
 
 # Create your models here.
 class User(AbstractUser):
