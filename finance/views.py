@@ -1,16 +1,18 @@
 import json
-from django.shortcuts import render
-from django.http import HttpResponse, HttpResponseRedirect, JsonResponse
-from django.contrib.auth import authenticate, login, logout
-from django.urls import reverse
-from django.contrib.auth.decorators import login_required
-from django.db import IntegrityError
-
-from decimal import Decimal
-from django.core.paginator import Paginator
-from django.utils.timezone import activate
-from .models import *
 from datetime import datetime
+from decimal import Decimal
+
+from django.contrib.auth import authenticate, login, logout
+from django.contrib.auth.decorators import login_required
+from django.core.paginator import Paginator
+from django.db import IntegrityError
+from django.http import HttpResponseRedirect, JsonResponse
+from django.shortcuts import render
+from django.urls import reverse
+from django.utils.timezone import make_aware, now
+
+from .models import User, Account, Income, Expense, RecurringIncome, RecurringPayment
+
 
 def index(request):
     if (request.user.is_authenticated):
@@ -75,6 +77,7 @@ def register(request):
     else:
         return render(request, "finance/register.html")
 
+
 @login_required
 def account(request):
     user = request.user
@@ -86,19 +89,22 @@ def account(request):
         if not data: return JsonResponse({"error": "Empty POST request"}, status=400)
         title = data.get('title')
         amount = Decimal(data.get("amount"))
-        if not title or amount==None:return JsonResponse({"error": "Request info incomplete or missing"}, status=400)
-        new_acc = Account.objects.create(user=user,balance=0, name=title)
-        if amount>0: Income.objects.create(account=new_acc,amount=abs(amount))
-        elif amount<0: Expense.objects.create(account=new_acc,amount=abs(amount))
+        if not title or amount == None: return JsonResponse({"error": "Request info incomplete or missing"}, status=400)
+        new_acc = Account.objects.create(user=user, balance=0, name=title)
+        if amount > 0:
+            Income.objects.create(account=new_acc, amount=abs(amount))
+        elif amount < 0:
+            Expense.objects.create(account=new_acc, amount=abs(amount))
         return JsonResponse({
-                    "msg": "Account (wallet) added successfully",
-                    "id": new_acc.id
-            }, status=201)
+            "msg": "Account (wallet) added successfully",
+            "id": new_acc.id
+        }, status=201)
     elif request.method == "GET":
         accounts = user.accounts.all()
-        return JsonResponse([acc.serialize() for acc in accounts], safe=False, status=200)    
+        return JsonResponse([acc.serialize() for acc in accounts], safe=False, status=200)
     else:
         return JsonResponse({"error": "POST or GET request required."}, status=400)
+
 
 @login_required
 def accounts_delete(request, account_id):
@@ -110,9 +116,10 @@ def accounts_delete(request, account_id):
             return JsonResponse({"error": "Account doesn't exist"}, status=400)
         user_account.delete()
         return JsonResponse({
-                        "msg": "User account removed successfully"
-                }, status=200) 
+            "msg": "User account removed successfully"
+        }, status=200)
     return JsonResponse({"error": "Delete request required."}, status=400)
+
 
 @login_required
 def accounts(request, account_id):
@@ -127,6 +134,7 @@ def accounts(request, account_id):
     else:
         return JsonResponse({"error": "GET request required."}, status=400)
 
+
 @login_required
 def all_incomes(request, account_id):
     user = request.user
@@ -140,8 +148,8 @@ def all_incomes(request, account_id):
             page_number = request.GET.get('page')
             paginator = Paginator([payment.serialize() for payment in payments], 10)
             page_obj = paginator.get_page(page_number)
-            return JsonResponse(page_obj.object_list, safe=False, status=200)    
-        return JsonResponse([payment.serialize() for payment in payments], safe=False, status=200)    
+            return JsonResponse(page_obj.object_list, safe=False, status=200)
+        return JsonResponse([payment.serialize() for payment in payments], safe=False, status=200)
     elif request.method == "POST":
         data = json.loads(request.body)
         if not data: return JsonResponse({"error": "Empty POST request"}, status=400)
@@ -151,11 +159,12 @@ def all_incomes(request, account_id):
         user_account.update_balance()
         new_income.refresh_from_db()
         return JsonResponse({
-                "sub": new_income.serialize(),
-                "msg": "Income added successfully"
-        }, status=201) 
+            "sub": new_income.serialize(),
+            "msg": "Income added successfully"
+        }, status=201)
     else:
-        return JsonResponse({"error": "GET or POST request required."}, status=400) 
+        return JsonResponse({"error": "GET or POST request required."}, status=400)
+
 
 @login_required
 def all_expenses(request, account_id):
@@ -170,8 +179,8 @@ def all_expenses(request, account_id):
             page_number = request.GET.get('page')
             paginator = Paginator([payment.serialize() for payment in payments], 10)
             page_obj = paginator.get_page(page_number)
-            return JsonResponse(page_obj.object_list, safe=False, status=200)   
-        return JsonResponse([payment.serialize() for payment in payments], safe=False, status=200)    
+            return JsonResponse(page_obj.object_list, safe=False, status=200)
+        return JsonResponse([payment.serialize() for payment in payments], safe=False, status=200)
     elif request.method == "POST":
         data = json.loads(request.body)
         if not data: return JsonResponse({"error": "Empty POST request"}, status=400)
@@ -181,11 +190,12 @@ def all_expenses(request, account_id):
         user_account.update_balance()
         new_expense.refresh_from_db()
         return JsonResponse({
-                "sub": new_expense.serialize(),
-                "msg": "Expense added successfully"
-        }, status=201) 
+            "sub": new_expense.serialize(),
+            "msg": "Expense added successfully"
+        }, status=201)
     else:
-        return JsonResponse({"error": "GET or POST request required."}, status=400) 
+        return JsonResponse({"error": "GET or POST request required."}, status=400)
+
 
 @login_required
 def all_rec_payments(request, account_id):
@@ -193,21 +203,21 @@ def all_rec_payments(request, account_id):
     if request.method == "GET":
         try:
             account_id = user.accounts.get(pk=account_id)
-            payments = account_id.rec_expenses.order_by("-id").exclude(end_date__lte=timezone.now()).all()
+            payments = account_id.rec_expenses.order_by("-id").exclude(end_date__lte=now()).all()
         except:
             return JsonResponse({"error": f"Account: {account_id}. Doesn't exist"}, status=400)
         if request.GET.get('page'):
             page_number = request.GET.get('page')
             paginator = Paginator([payment.serialize() for payment in payments], 10)
             page_obj = paginator.get_page(page_number)
-            return JsonResponse(page_obj.object_list, safe=False, status=200)   
-        return JsonResponse([payment.serialize() for payment in payments], safe=False, status=200)    
+            return JsonResponse(page_obj.object_list, safe=False, status=200)
+        return JsonResponse([payment.serialize() for payment in payments], safe=False, status=200)
     elif request.method == "POST":
         data = json.loads(request.body)
         if not data: return JsonResponse({"error": "Empty POST request"}, status=400)
         user_account = user.accounts.get(pk=account_id)
         amount = Decimal(data.get("amount"))
-        description = data.get("description","No description")
+        description = data.get("description", "No description")
         str_date = data.get("start_date")
         start_date = datetime.strptime(str_date, r'%Y-%m-%d')
         schedule_type = data.get("schedule_type")
@@ -222,11 +232,12 @@ def all_rec_payments(request, account_id):
         user_account.update_balance()
         new_expense.refresh_from_db()
         return JsonResponse({
-                "sub": new_expense.serialize(),
-                "msg": "New Subscription added successfully"
-        }, status=201) 
+            "sub": new_expense.serialize(),
+            "msg": "New Subscription added successfully"
+        }, status=201)
     else:
         return JsonResponse({"error": "GET or POST request required."}, status=400)
+
 
 @login_required
 def all_rec_incomes(request, account_id):
@@ -234,21 +245,21 @@ def all_rec_incomes(request, account_id):
     if request.method == "GET":
         try:
             account_id = user.accounts.get(pk=account_id)
-            payments = account_id.rec_incomes.order_by("-id").exclude(end_date__lte=timezone.now()).all()
+            payments = account_id.rec_incomes.order_by("-id").exclude(end_date__lte=now()).all()
         except:
             return JsonResponse({"error": f"Account: {account_id}. Doesn't exist"}, status=400)
         if request.GET.get('page'):
             page_number = request.GET.get('page')
             paginator = Paginator([payment.serialize() for payment in payments], 10)
             page_obj = paginator.get_page(page_number)
-            return JsonResponse(page_obj.object_list, safe=False, status=200)   
-        return JsonResponse([payment.serialize() for payment in payments], safe=False, status=200)   
+            return JsonResponse(page_obj.object_list, safe=False, status=200)
+        return JsonResponse([payment.serialize() for payment in payments], safe=False, status=200)
     elif request.method == "POST":
         data = json.loads(request.body)
         if not data: return JsonResponse({"error": "Empty POST request"}, status=400)
         user_account = user.accounts.get(pk=account_id)
         amount = Decimal(data.get("amount"))
-        description = data.get("description","No title")
+        description = data.get("description", "No title")
         str_date = data.get("start_date")
         start_date = datetime.strptime(str_date, r'%Y-%m-%d')
         schedule_type = data.get("schedule_type")
@@ -263,23 +274,25 @@ def all_rec_incomes(request, account_id):
         new_income.refresh_from_db()
         user_account.update_balance()
         return JsonResponse({
-                "sub": new_income.serialize(),
-                "msg": "New recurrent income added successfully"
-        }, status=201) 
+            "sub": new_income.serialize(),
+            "msg": "New recurrent income added successfully"
+        }, status=201)
     else:
         return JsonResponse({"error": "GET or POST request required."}, status=400)
+
 
 @login_required
 def rec_payment(request, id):
     user = request.user
     try:
-            payment = RecurringPayment.objects.get(id=id)
-            if payment.account not in user.accounts.all(): 
-                return JsonResponse({"error": f"The user does not have access rights to the payment with id: {id}"}, status=403) 
+        payment = RecurringPayment.objects.get(id=id)
+        if payment.account not in user.accounts.all():
+            return JsonResponse({"error": f"The user does not have access rights to the payment with id: {id}"},
+                                status=403)
     except:
-            return JsonResponse({"error": f"Payment with id: {id}. Doesn't exist"}, status=400) 
+        return JsonResponse({"error": f"Payment with id: {id}. Doesn't exist"}, status=400)
     if request.method == "GET":
-        return JsonResponse(payment.serialize(), safe=False, status=200 ) 
+        return JsonResponse(payment.serialize(), safe=False, status=200)
     else:
         return JsonResponse({"error": "GET request required."}, status=400)
 
@@ -288,32 +301,34 @@ def rec_payment(request, id):
 def rec_income(request, id):
     user = request.user
     try:
-            payment = RecurringIncome.objects.get(id=id)
-            if payment.account not in user.accounts.all(): 
-                return JsonResponse({"error": f"The user does not have access rights to the payment with id: {id}"}, status=403) 
+        payment = RecurringIncome.objects.get(id=id)
+        if payment.account not in user.accounts.all():
+            return JsonResponse({"error": f"The user does not have access rights to the payment with id: {id}"},
+                                status=403)
     except:
-            return JsonResponse({"error": f"Payment with id: {id}. Doesn't exist"}, status=400) 
+        return JsonResponse({"error": f"Payment with id: {id}. Doesn't exist"}, status=400)
     if request.method == "GET":
-        return JsonResponse(payment.serialize(), safe=False, status=200 ) 
+        return JsonResponse(payment.serialize(), safe=False, status=200)
     else:
         return JsonResponse({"error": "GET request required."}, status=400)
 
 
 @login_required
-def rec_payment_edit(request,id):
+def rec_payment_edit(request, id):
     user = request.user
     try:
         payment = RecurringPayment.objects.get(id=id)
-        if payment.account not in user.accounts.all(): 
-            return JsonResponse({"error": f"The user does not have access rights to the payment with id: {id}"}, status=403) 
+        if payment.account not in user.accounts.all():
+            return JsonResponse({"error": f"The user does not have access rights to the payment with id: {id}"},
+                                status=403)
     except:
-            return JsonResponse({"error": f"Payment with id: {id}. Doesn't exist"}, status=400) 
+        return JsonResponse({"error": f"Payment with id: {id}. Doesn't exist"}, status=400)
     if request.method == "PUT":
         data = json.loads(request.body)
         if not data: return JsonResponse({"error": "Empty PUT request"}, status=400)
         new_amount = data.get("amount")
         if not new_amount: return JsonResponse({"error": "No amount in request"}, status=400)
-        payment.amount =  new_amount
+        payment.amount = new_amount
         payment.save()
         payment.refresh_from_db()
         return JsonResponse({
@@ -323,17 +338,19 @@ def rec_payment_edit(request,id):
     else:
         return JsonResponse({"error": "PUT request required."}, status=400)
 
+
 @login_required
-def rec_payment_stop(request,id):
+def rec_payment_stop(request, id):
     user = request.user
     try:
         payment = RecurringPayment.objects.get(id=id)
-        if payment.account not in user.accounts.all(): 
-            return JsonResponse({"error": f"The user does not have access rights to the payment with id: {id}"}, status=403) 
+        if payment.account not in user.accounts.all():
+            return JsonResponse({"error": f"The user does not have access rights to the payment with id: {id}"},
+                                status=403)
     except:
-            return JsonResponse({"error": f"Payment with id: {id}. Doesn't exist"}, status=400) 
+        return JsonResponse({"error": f"Payment with id: {id}. Doesn't exist"}, status=400)
     if request.method == "PUT":
-        payment.end_date = timezone.now()
+        payment.end_date = now()
         payment.save()
         return JsonResponse({"msg": f"Payment with id: {id}. Has been stopped"}, status=200)
     else:
@@ -341,36 +358,39 @@ def rec_payment_stop(request,id):
 
 
 @login_required
-def rec_income_stop(request,id):
+def rec_income_stop(request, id):
     user = request.user
     try:
         payment = RecurringIncome.objects.get(id=id)
-        if payment.account not in user.accounts.all(): 
-            return JsonResponse({"error": f"The user does not have access rights to the payment with id: {id}"}, status=403) 
+        if payment.account not in user.accounts.all():
+            return JsonResponse({"error": f"The user does not have access rights to the payment with id: {id}"},
+                                status=403)
     except:
-            return JsonResponse({"error": f"Payment with id: {id}. Doesn't exist"}, status=400) 
+        return JsonResponse({"error": f"Payment with id: {id}. Doesn't exist"}, status=400)
     if request.method == "PUT":
-        payment.end_date = timezone.now()
+        payment.end_date = now()
         payment.save()
         return JsonResponse({"msg": f"Payment with id: {id}. Has been stopped"}, status=200)
     else:
         return JsonResponse({"error": "PUT request required."}, status=400)
 
+
 @login_required
-def rec_income_edit(request,id):
+def rec_income_edit(request, id):
     user = request.user
     try:
         payment = RecurringIncome.objects.get(id=id)
-        if payment.account not in user.accounts.all(): 
-            return JsonResponse({"error": f"The user does not have access rights to the payment with id: {id}"}, status=403) 
+        if payment.account not in user.accounts.all():
+            return JsonResponse({"error": f"The user does not have access rights to the payment with id: {id}"},
+                                status=403)
     except:
-            return JsonResponse({"error": f"Payment with id: {id}. Doesn't exist"}, status=400) 
+        return JsonResponse({"error": f"Payment with id: {id}. Doesn't exist"}, status=400)
     if request.method == "PUT":
         data = json.loads(request.body)
         if not data: return JsonResponse({"error": "Empty PUT request"}, status=400)
         new_amount = data.get("amount")
         if not new_amount: return JsonResponse({"error": "No amount in request"}, status=400)
-        payment.amount =  new_amount
+        payment.amount = new_amount
         payment.save()
         payment.refresh_from_db()
         return JsonResponse({
@@ -379,6 +399,3 @@ def rec_income_edit(request,id):
         }, status=200)
     else:
         return JsonResponse({"error": "PUT request required."}, status=400)
-
-
-        

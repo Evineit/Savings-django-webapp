@@ -1,7 +1,6 @@
 from django import forms
 from django.core.exceptions import ValidationError
-from .models import *
-
+from .models import User, Account, Income, Expense, RecurringIncome, RecurringPayment
 
 
 class IncomeForm(forms.ModelForm):
