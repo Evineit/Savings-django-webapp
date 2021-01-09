@@ -9,7 +9,7 @@ from django.db import IntegrityError
 from decimal import Decimal
 from django.core.paginator import Paginator
 from django.utils.timezone import activate
-from .models import *
+from .models import User, Account, Income, Expense, RecurringIncome, RecurringPayment
 from datetime import datetime
 
 def index(request):

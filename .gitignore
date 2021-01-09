@@ -1,6 +1,6 @@
 .idea/.gitignore
 .idea
-/.vscode/
+.vscode/
 .env*
 !.env.example
 *.pyc

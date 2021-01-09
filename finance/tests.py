@@ -4,9 +4,11 @@ import json
 from django.http.response import JsonResponse
 from django.test import TestCase, Client
 from django.core.paginator import Paginator
-from .models import *
+from .models import User, Account, Income, Expense, RecurringIncome, RecurringPayment
+from .util import add_months
 import datetime
 from django.utils.timezone import make_aware
+from django.utils import timezone
 
 
 # Create your tests here.
