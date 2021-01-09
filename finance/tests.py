@@ -14,12 +14,8 @@ from .util import add_months
 
 class PostTestCase(TestCase):
     def setUp(self):
-        # Create users.
+        # Create user and account(wallet).
         u1 = User.objects.create_user(username="u1", email="u1@seidai.com", password="pass1234")
-        # u2 = User.objects.create_user(username="u2", email="u2@seidai.com", password="pass1234")
-        # u3 = User.objects.create_user(username="u3", email="u3@seidai.com", password="pass1234")
-
-        # Create posts.
         Account.objects.create(user=u1, name="default", balance=0)
 
     def test_server_account_name(self):
