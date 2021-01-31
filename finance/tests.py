@@ -105,17 +105,17 @@ class PostTestCase(TestCase):
 
     def test_rec_payment_cycles_daily(self):
         date = datetime.datetime(2020, 11, 1)
-        test = self.create_test_recurring_payment_object(
+        recurring_payment = self.create_test_recurring_payment_object(
             start_date=date,
             schedule_type="Custom"
         )
-        self.assertEqual(test.children.count(), 0)
-        test.update_children()
+        self.assertEqual(recurring_payment.children.count(), 0)
+        recurring_payment.update_children()
         # Checks if the first payment in the first child is the same as the start date
-        self.assertEqual(test.start_date, test.children.order_by("added_date").first().added_date)
+        self.assertEqual(recurring_payment.start_date, recurring_payment.children.order_by("added_date").first().added_date)
         # Given that the schedule is daily, checks the number of children is the same as the
         # difference in days + 1 (the first payment)
-        self.assertEqual(test.children.count(), (timezone.now() - make_aware(date)).days + 1)
+        self.assertEqual(recurring_payment.children.count(), (timezone.now() - make_aware(date)).days + 1)
 
     def test_rec_payment_children_monthly(self):
         rec_payment = self.create_test_recurring_payment_object(
@@ -168,12 +168,7 @@ class PostTestCase(TestCase):
 
     def test_server_recurring_payments(self):
         self.client.force_login(self.u1)
-        response = self.client.post('/accounts/1/recpayments', data={
-            'amount': '15',
-            'description': 'test',
-            'start_date': '2020-11-01',
-            'schedule_type': 'Custom'
-        }, content_type='application/json')
+        response = self.post_new_test_recurring_payment()
         response_2 = self.client.get('/accounts/1')
         response_3 = self.client.get('/accounts/1/recpayments')
         self.assertEqual(response.status_code, 201)
@@ -209,7 +204,6 @@ class PostTestCase(TestCase):
         )
         response_payments = self.client.get('/accounts/1/recpayments')
         # Assert only 1 RecurringPayment is active
-        self.assertEqual(response_payments.status_code, 200)
         self.assertEqual(len(response_payments.json()), 1)
         # Updates the children at the time
         self.client.get('/accounts/1')
@@ -229,14 +223,8 @@ class PostTestCase(TestCase):
 
     def test_server_recurring_payments_stop(self):
         self.client.force_login(self.u1)
-        self.client.post('/accounts/1/recpayments', data={
-            'amount': '15',
-            'description': 'test',
-            'start_date': '2020-11-01',
-            'schedule_type': 'Custom'
-        }, content_type='application/json')
+        self.post_new_test_recurring_payment()
         response_active_payments = self.client.get('/accounts/1/recpayments')
-        self.assertEqual(response_active_payments.status_code, 200)
         self.assertEqual(len(response_active_payments.json()), 1)
 
         pay_id = response_active_payments.json()[0].get("id")
@@ -289,14 +277,8 @@ class PostTestCase(TestCase):
 
     def test_server_recurring_payments_change_amount(self):
         self.client.force_login(self.u1)
-        self.client.post('/accounts/1/recpayments', data={
-            'amount': '15',
-            'description': 'test',
-            'start_date': '2020-11-01',
-            'schedule_type': 'Custom'
-        }, content_type='application/json')
+        self.post_new_test_recurring_payment()
         response = self.client.get('/accounts/1/recpayments')
-        self.assertEqual(response.status_code, 200)
         pay_id = response.json()[0].get("id")
         change_amount_response = self.client.put(f'/recpayments/{pay_id}/edit', data={
             'amount': 100
@@ -314,15 +296,13 @@ class PostTestCase(TestCase):
 
     def test_server_recurring_incomes_change_amount(self):
         self.client.force_login(self.u1)
-        add_response = self.client.post('/accounts/1/recincomes', data={
+        self.client.post('/accounts/1/recincomes', data={
             'amount': '15',
             'description': 'test',
             'start_date': '2020-11-01',
             'schedule_type': 'Custom'
         }, content_type='application/json')
         response = self.client.get('/accounts/1/recincomes')
-        self.assertEqual(add_response.status_code, 201)
-        self.assertEqual(response.status_code, 200)
         pay_id = response.json()[0].get("id")
         change_amount_response = self.client.put(f'/recincomes/{pay_id}/edit', data={
             'amount': 100
@@ -348,3 +328,12 @@ class PostTestCase(TestCase):
             end_date=make_aware(end_date) if end_date else end_date,
             schedule_type=schedule_type
         )
+
+    
+    def post_new_test_recurring_payment(self):
+        return self.client.post('/accounts/1/recpayments', data={
+            'amount': '15',
+            'description': 'test',
+            'start_date': '2020-11-01',
+            'schedule_type': 'Custom'
+        }, content_type='application/json')
