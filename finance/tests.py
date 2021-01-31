@@ -16,7 +16,7 @@ class PostTestCase(TestCase):
     @classmethod
     def setUpTestData(cls):
         cls.u1 = User.objects.create_user(username="u1", email="u1@seidai.com", password="pass1234")
-        cls.acc1 = Account.objects.create(user=cls.u1, name="default", balance=0)
+        cls.account_1 = Account.objects.create(user=cls.u1, name="default", balance=0)
 
     
     def setUp(self):
@@ -66,11 +66,8 @@ class PostTestCase(TestCase):
         self.assertEqual(len(response_all_inc.json()), 1)
 
     def test_rec_payment_cycles_monthly(self):
-        rec_payment = RecurringPayment.objects.create(
-            account=Account.objects.get(),
-            description="test",
-            amount=10,
-            start_date=make_aware(datetime.datetime(2020, 11, 1)),
+        rec_payment = self.create_test_recurring_payment_object(
+            start_date=datetime.datetime(2020, 11, 1),
             schedule_type="Monthly"
         )
         cycles = rec_payment.cycles_at_date(make_aware(datetime.datetime(2020, 11, 11)))
@@ -81,11 +78,8 @@ class PostTestCase(TestCase):
         self.assertEqual(cycles, 12)
 
     def test_rec_incomes_cycles_monthly(self):
-        rec_payment = RecurringIncome.objects.create(
-            account=Account.objects.get(),
-            description="test",
-            amount=10,
-            start_date=make_aware(datetime.datetime(2020, 11, 1)),
+        rec_payment = self.create_test_recurring_payment_object(
+            start_date=datetime.datetime(2020, 11, 1),
             schedule_type="Monthly"
         )
         cycles = rec_payment.cycles_at_date(make_aware(datetime.datetime(2020, 11, 11)))
@@ -96,11 +90,8 @@ class PostTestCase(TestCase):
         self.assertEqual(cycles, 12)
 
     def test_rec_payment_create_child(self):
-        recurring_payment = RecurringPayment.objects.create(
-            account=Account.objects.get(),
-            description="test",
-            amount=10,
-            start_date=make_aware(datetime.datetime(2020, 11, 1)),
+        recurring_payment = self.create_test_recurring_payment_object(
+            start_date=datetime.datetime(2020, 11, 1),
             schedule_type="Custom"
         )
         Expense.objects.create(
@@ -113,11 +104,8 @@ class PostTestCase(TestCase):
         self.assertEqual(Expense.objects.filter(recurring_parent=recurring_payment).count(), 1)
 
     def test_rec_payment_cycles_daily(self):
-        date = datetime.datetime(2020, 11, 1, tzinfo=timezone.get_current_timezone())
-        test = RecurringPayment.objects.create(
-            account=Account.objects.get(),
-            description="test",
-            amount=10,
+        date = datetime.datetime(2020, 11, 1)
+        test = self.create_test_recurring_payment_object(
             start_date=date,
             schedule_type="Custom"
         )
@@ -127,14 +115,11 @@ class PostTestCase(TestCase):
         self.assertEqual(test.start_date, test.children.order_by("added_date").first().added_date)
         # Given that the schedule is daily, checks the number of children is the same as the
         # difference in days + 1 (the first payment)
-        self.assertEqual(test.children.count(), (timezone.now() - date).days + 1)
+        self.assertEqual(test.children.count(), (timezone.now() - make_aware(date)).days + 1)
 
     def test_rec_payment_children_monthly(self):
-        rec_payment = RecurringPayment.objects.create(
-            account=Account.objects.get(),
-            description="test",
-            amount=10,
-            start_date=make_aware(datetime.datetime(2020, 11, 1)),
+        rec_payment = self.create_test_recurring_payment_object(
+            start_date=datetime.datetime(2020, 11, 1),
             schedule_type="Monthly"
         )
         self.assertEqual(rec_payment.children.count(), 0)
@@ -173,12 +158,12 @@ class PostTestCase(TestCase):
 
     def test_server_fail_missing_data_recurring_payments(self):
         self.client.force_login(self.u1)
-        response: JsonResponse = self.client.post(f'/accounts/{self.acc1.id}', content_type='application/json')
+        response: JsonResponse = self.client.post(f'/accounts/{self.account_1.id}', content_type='application/json')
         self.assertEqual(response.status_code, 400)
 
     def test_server_fail_missing_data_recurring_incomes(self):
         self.client.force_login(self.u1)
-        response: JsonResponse = self.client.post(f'/accounts/{self.acc1.id}/recincomes', content_type='application/json')
+        response: JsonResponse = self.client.post(f'/accounts/{self.account_1.id}/recincomes', content_type='application/json')
         self.assertEqual(response.status_code, 400)
 
     def test_server_recurring_payments(self):
@@ -213,19 +198,13 @@ class PostTestCase(TestCase):
 
     def test_server_recurring_payments_get_actives(self):
         self.client.force_login(self.u1)
-        rec_payment_active = RecurringPayment.objects.create(
-            account=Account.objects.get(),
-            description="test",
-            amount=10,
-            start_date=make_aware(datetime.datetime(2020, 9, 1)),
+        rec_payment_active = self.create_test_recurring_payment_object(
+            start_date=datetime.datetime(2020, 9, 1),
             schedule_type="Monthly"
         )
-        rec_payment_inactive = RecurringPayment.objects.create(
-            account=Account.objects.get(),
-            description="test",
-            amount=10,
-            start_date=make_aware(datetime.datetime(2020, 9, 1)),
-            end_date=make_aware(datetime.datetime(2020, 10, 1)),
+        rec_payment_inactive = self.create_test_recurring_payment_object(
+            start_date=datetime.datetime(2020, 9, 1),
+            end_date=datetime.datetime(2020, 10, 1),
             schedule_type="Monthly"
         )
         response_payments = self.client.get('/accounts/1/recpayments')
@@ -236,20 +215,14 @@ class PostTestCase(TestCase):
         self.client.get('/accounts/1')
         self.assertGreaterEqual(rec_payment_active.children.count(), 3)
         self.assertEqual(rec_payment_inactive.children.count(), 2)
-        rec_payment_active = RecurringPayment.objects.create(
-            account=Account.objects.get(),
-            description="test",
-            amount=10,
-            start_date=make_aware(datetime.datetime(2020, 9, 1)),
-            end_date=make_aware(datetime.datetime(2020, 10, 1)),
+        rec_payment_active = self.create_test_recurring_payment_object(
+            start_date=datetime.datetime(2020, 9, 1),
+            end_date=datetime.datetime(2020, 10, 1),
             schedule_type="Custom"
         )
-        rec_payment_active = RecurringPayment.objects.create(
-            account=Account.objects.get(),
-            description="test",
-            amount=10,
-            start_date=make_aware(datetime.datetime(2020, 9, 1)),
-            end_date=make_aware(datetime.datetime(2021, 10, 1)),
+        rec_payment_active = self.create_test_recurring_payment_object(
+            start_date=datetime.datetime(2020, 9, 1),
+            end_date=datetime.datetime(2021, 10, 1),
             schedule_type="Yearly"
         )
         self.client.get('/accounts/default')
@@ -295,28 +268,19 @@ class PostTestCase(TestCase):
         self.assertEqual(len(response_active_incomes.json()), 0)
 
     def test_server_recurring_payment_next_payment_date(self):
-        rec_payment_1 = RecurringPayment.objects.create(
-            account=Account.objects.get(),
-            description="test",
-            amount=10,
-            start_date=make_aware(datetime.datetime(2020, 10, 1)),
-            end_date=make_aware(datetime.datetime(2020, 11, 1)),
+        rec_payment_1 = self.create_test_recurring_payment_object(
+            start_date=datetime.datetime(2020, 10, 1),
+            end_date=datetime.datetime(2020, 11, 1),
             schedule_type="Custom"
         )
-        rec_payment_2 = RecurringPayment.objects.create(
-            account=Account.objects.get(),
-            description="test",
-            amount=10,
-            start_date=make_aware(datetime.datetime(2020, 9, 1)),
-            end_date=make_aware(datetime.datetime(2020, 11, 1)),
+        rec_payment_2 = self.create_test_recurring_payment_object(
+            start_date=datetime.datetime(2020, 9, 1),
+            end_date=datetime.datetime(2020, 11, 1),
             schedule_type="Monthly"
         )
-        rec_payment_3 = RecurringPayment.objects.create(
-            account=Account.objects.get(),
-            description="test",
-            amount=10,
-            start_date=make_aware(datetime.datetime(2020, 9, 1)),
-            end_date=make_aware(datetime.datetime(2021, 11, 1)),
+        rec_payment_3 = self.create_test_recurring_payment_object(
+            start_date=datetime.datetime(2020, 9, 1),
+            end_date=datetime.datetime(2021, 11, 1),
             schedule_type="Yearly"
         )
         self.assertEqual(rec_payment_1.next_payment_date().date(), datetime.date(2020, 11, 2))
@@ -373,3 +337,14 @@ class PostTestCase(TestCase):
         other_child = rec_payment_1.children.order_by("-id")[1]
         self.assertEqual(Decimal(child_last.amount), Decimal(100))
         self.assertEqual(Decimal(other_child.amount), Decimal(15))
+
+    
+    def create_test_recurring_payment_object(self,start_date, schedule_type, end_date=None):
+        return RecurringPayment.objects.create(
+            account=self.account_1,
+            description="test",
+            amount=10,
+            start_date=make_aware(start_date),
+            end_date=make_aware(end_date) if end_date else end_date,
+            schedule_type=schedule_type
+        )
