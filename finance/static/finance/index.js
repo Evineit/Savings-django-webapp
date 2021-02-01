@@ -1,21 +1,21 @@
 document.addEventListener('DOMContentLoaded', function() {
-    starting_acc = document.getElementById('accountName').dataset.accountId
+    let starting_acc = document.getElementById('accountName').dataset.accountId
     reload_subs(starting_acc)
     set_buttons()
     set_listeners()
 
     // These are only called at the start, because the targets won't change like the other listeners
     // in set_listeners()
-    document.getElementById("rec_exp_order").addEventListener('change',(e) =>{
+    document.getElementById("rec_exp_order").addEventListener('change',() =>{
         order_rec_container_by(document.getElementById("rec_expenses_container"),document.getElementById("rec_exp_order").value)
     })
-    document.getElementById("rec_inc_order").addEventListener('change',(e) =>{
+    document.getElementById("rec_inc_order").addEventListener('change',() =>{
         order_rec_container_by(document.getElementById("rec_incomes_container"),document.getElementById("rec_inc_order").value)
     })
-    document.getElementById("inc_order").addEventListener('change',(e) =>{
+    document.getElementById("inc_order").addEventListener('change',() =>{
         order_container_by(document.getElementById("incomes_container"),document.getElementById("inc_order").value)
     })
-    document.getElementById("exp_order").addEventListener('change',(e) =>{
+    document.getElementById("exp_order").addEventListener('change',() =>{
         order_container_by(document.getElementById("expenses_container"),document.getElementById("exp_order").value)
     })
 });
@@ -25,7 +25,7 @@ function set_listeners(){
 
     document.querySelector('#changeAccForm>form').onsubmit = function() {
         const new_account = document.getElementById("change_account").value
-        if (new_account == account_name){
+        if (new_account === account_name){
             closeForm()
             return false
         } 
@@ -99,7 +99,7 @@ function set_listeners(){
         .then(response =>{
             if (response.ok){
                 response.json().then(result=>{
-                    new_account = document.createElement('option') 
+                    let new_account = document.createElement('option')
                     new_account.value = result.id
                     new_account.innerHTML = title
                     document.getElementById("change_account").append(new_account) 
@@ -129,9 +129,9 @@ function set_listeners(){
                 credentials: "include"
             })
             .then(response => {
-                if (response.status == 201){
+                if (response.status === 201){
                     response.json().then(result =>{
-                        new_sub = create_basic_mov(result.sub)
+                        let new_sub = create_basic_mov(result.sub)
                         new_sub.className += " subs-income"
                         document.getElementById("incomes_container").prepend(new_sub)
                         reload_balance(account_name)
@@ -162,9 +162,9 @@ function set_listeners(){
             })
             .then(response => {
                 // response.json()
-                if (response.status == 201){
+                if (response.status === 201){
                     response.json().then(result =>{
-                        new_sub = create_basic_mov(result.sub)
+                        let new_sub = create_basic_mov(result.sub)
                         new_sub.className += " subs-expense" 
                         document.getElementById("expenses_container").prepend(new_sub)
                         reload_balance(account_name)
@@ -203,7 +203,7 @@ function set_listeners(){
             .then(response => {
                 if (response.ok){
                     response.json().then(result =>{
-                        new_sub = create_recurrent(result.sub,"recpayments",change_amount)
+                        let new_sub = create_recurrent(result.sub, "recpayments", change_amount)
                         document.getElementById("rec_expenses_container").prepend(new_sub)
                         reload_balance(account_name)
                     })
@@ -240,7 +240,7 @@ function set_listeners(){
             .then(response => {
                 if (response.ok){
                     response.json().then(result =>{
-                        new_sub = create_recurrent(result.sub,"recincomes",change_recincomes_amount)
+                        let new_sub = create_recurrent(result.sub, "recincomes", change_recincomes_amount)
                         document.getElementById("rec_incomes_container").prepend(new_sub)
                         reload_balance(account_name)
                     })
@@ -341,7 +341,7 @@ function reload_subs(account_name) {
         .then(response => response.json())
         .then(payments => {
             payments.forEach(payment => {
-                new_sub = create_recurrent(payment,"recpayments",change_amount)
+                let new_sub = create_recurrent(payment, "recpayments", change_amount)
                 document.getElementById("rec_expenses_container").append(new_sub)
                 order_rec_container_by(document.getElementById("rec_expenses_container"),"nex_pay_asc")
             });
@@ -350,7 +350,7 @@ function reload_subs(account_name) {
     .then(response => response.json())
     .then(payments => {
         payments.forEach(payment => {
-            new_sub = create_recurrent(payment,"recincomes", change_recincomes_amount)
+            let new_sub = create_recurrent(payment, "recincomes", change_recincomes_amount)
             document.getElementById("rec_incomes_container").append(new_sub)
         });
         order_rec_container_by(document.getElementById("rec_incomes_container"),"nex_pay_asc")
@@ -359,7 +359,7 @@ function reload_subs(account_name) {
     .then(response => response.json())
     .then(payments => {
         payments.forEach(payment => {
-            new_sub = create_basic_mov(payment)
+            let new_sub = create_basic_mov(payment)
             new_sub.className+= " subs-income"
             incomes_div.append(new_sub)
         });
@@ -369,7 +369,7 @@ function reload_subs(account_name) {
     .then(response => response.json())
     .then(payments => {
         payments.forEach(payment => {
-            new_sub = create_basic_mov(payment)
+            let new_sub = create_basic_mov(payment)
             new_sub.className += " subs-expense"
             expenses_div.append(new_sub)
         });
@@ -391,7 +391,7 @@ function create_recurrent(payment, typeStr, change_amount_fun){
     schedule_type.className = "btn-secondary subs-top-info btn-sm"
     next_date.className =     "btn-secondary subs-top-info btn-sm"
     element.className = "subs subs-expense"
-    if (typeStr == "recincomes") element.className = "subs subs-income"
+    if (typeStr === "recincomes") element.className = "subs subs-income"
     top_div.className = "subs-top-container"
     bot_div.className = "subs-bot-container"
     amount.className = "subs-amount"
@@ -526,7 +526,7 @@ function hide_payment(element){
 }
 
 function reset_recurrent_form(form){
-    today = new Date().toISOString().split("T")[0]
+    let today = new Date().toISOString().split("T")[0]
     document.querySelector(`#${form}>form>input`).value = null;
     document.querySelector(`#${form}>form>input[name="amount"]`).value = null
     document.getElementById("start").setAttribute("min", today);
@@ -555,21 +555,22 @@ function sort_by_timestamp(a,b){
 }
 
 function order_rec_container_by(containerElem, sort){
-    arr = Array.from(containerElem.children)
+    let arr = Array.from(containerElem.children)
     containerElem.innerHTML = ''
-    if (sort == "amount_asc"){
+    let new_arr;
+    if (sort === "amount_asc") {
         new_arr = arr.sort(sort_by_amount_asc);
-    }else if (sort == "amount_dsc"){
+    } else if (sort === "amount_dsc") {
         new_arr = arr.sort(sort_by_amount_asc).reverse();
-    }else if (sort == "nex_pay_asc"){
+    } else if (sort === "nex_pay_asc") {
         new_arr = arr.sort(sort_by_timestamp)
-    }else if (sort == "nex_pay_dsc"){
+    } else if (sort === "nex_pay_dsc") {
         new_arr = arr.sort(sort_by_timestamp).reverse()
-    }else if (sort == "title_asc"){
-        new_arr = arr.sort((a,b) => a.dataset.title.localeCompare(b.dataset.title))
-    }else if (sort == "title_dsc"){
-        new_arr = arr.sort((a,b) => b.dataset.title.localeCompare(a.dataset.title)) 
-    }else{
+    } else if (sort === "title_asc") {
+        new_arr = arr.sort((a, b) => a.dataset.title.localeCompare(b.dataset.title))
+    } else if (sort === "title_dsc") {
+        new_arr = arr.sort((a, b) => b.dataset.title.localeCompare(a.dataset.title))
+    } else {
         return
     }
     new_arr.forEach(elem =>{
@@ -577,19 +578,20 @@ function order_rec_container_by(containerElem, sort){
     })
   }
   function order_container_by(containerElem, sort){
-    arr = Array.from(containerElem.children)
+    let arr = Array.from(containerElem.children)
     containerElem.innerHTML = ''
-    if (sort == "amount_asc"){
-        new_arr = arr.sort(sort_by_amount_asc);
-    }else if (sort == "amount_dsc"){
-        new_arr = arr.sort(sort_by_amount_asc).reverse();
-    }else if (sort == "date_asc"){
-        new_arr = arr.sort(sort_by_timestamp)
-    }else if (sort == "date_dsc"){
-        new_arr = arr.sort(sort_by_timestamp).reverse()
-    }else{
-        return
-    }
+      let new_arr;
+      if (sort === "amount_asc") {
+          new_arr = arr.sort(sort_by_amount_asc);
+      } else if (sort === "amount_dsc") {
+          new_arr = arr.sort(sort_by_amount_asc).reverse();
+      } else if (sort === "date_asc") {
+          new_arr = arr.sort(sort_by_timestamp)
+      } else if (sort === "date_dsc") {
+          new_arr = arr.sort(sort_by_timestamp).reverse()
+      } else {
+          return
+      }
     new_arr.forEach(elem =>{
         containerElem.append(elem)
     })
