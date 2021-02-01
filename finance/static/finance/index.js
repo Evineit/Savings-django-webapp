@@ -62,7 +62,10 @@ function set_listeners(){
                 .then(response =>{
                     if (response.ok){
                         response.json().then(result=>{
-                            // TODO: if last account redirect to index
+                            if (result.length === 0) {
+                                location.reload()
+                                return false
+                            }
                             const new_account = result[0]
                             const current_name = document.querySelector('#accountName')
                             current_name.innerHTML = new_account.name
